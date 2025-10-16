@@ -1,127 +1,91 @@
+// ======= DOM =======
+const themeNameEl = document.getElementById("theme-name");
+const guessInput = document.getElementById("guess-input");
+const submitBtn = document.getElementById("submit-guess");
+const invalidWord = document.getElementById("invalid-word");
+const feedbackEl = document.getElementById("feedback");
+const attemptsEl = document.getElementById("attempt-count");
+const hintDisplay = document.getElementById("hint-display");
+const hintBtn = document.getElementById("hint-button");
+const mascotBtn = document.getElementById("chipBtn");
+const rulesModal = document.getElementById("rules-modal");
+const closeRules = document.getElementById("close-rules");
 
-// ==== CACHE DOM ====
-const themeName = document.getElementById("themeName");
-const attrsLeftEl = document.getElementById("attrsLeft");
-const finalLeftEl = document.getElementById("finalLeft");
-const progressBar = document.getElementById("progressBar");
-const historyEl = document.getElementById("history");
-const invalidMsg = document.getElementById("invalidMsg");
-const wordHintEl = document.getElementById("wordHint");
-const hintTextEl = document.getElementById("hintText");
-const finalArea = document.getElementById("finalArea");
-const attrInput = document.getElementById("attrInput");
-const finalInput = document.getElementById("finalInput");
-
-// ==== GAME CONFIG ====
+// ======= GAME DATA =======
 const THEMES = [
   {
-    name: "Volcano",
-    targetWord: "caldera",
-    hint: "It's the crater at the top",
-    words: [
-      "lava","magma","ash","eruption","mountain","rock","crater","vent",
-      "cone","ridge","plate","lavaflow","pyroclastic","igneous","volcanic",
-      "tectonic","basalt","scoria","andesite","pumice","bomb","lava tube",
-      "lava dome","shield","stratovolcano","composite","tuff","lava plateau",
-      "volcanism","fumarole","lava lake","lava vent","lava deposit",
-      "lava field","pyroclastic flow","lava fountain","lava bomb",
-      "cinder cone","caldera rim"
-    ]
+    name:"Volcano",
+    targetWord:"caldera",
+    hint:"It's the crater at the top",
+    words:["lava","magma","ash","eruption","mountain","rock","crater","vent","cone","ridge","plate","lavaflow","pyroclastic","igneous","volcanic","tectonic","basalt","scoria","andesite","pumice","bomb","lava tube","lava dome","shield","stratovolcano","composite","tuff","lava plateau","volcanism","fumarole","lava lake","lava vent","lava deposit","lava field","pyroclastic flow","lava fountain","lava bomb","cinder cone","caldera rim"]
   },
   {
-    name: "Mountains",
-    targetWord: "ridge",
-    hint: "Part of the mountain range",
-    words: [
-      "peak","valley","summit","slope","ridge","hill","cliff","plateau",
-      "mountain","range","crag","outcrop","foothill","alpine","elevation",
-      "terrain","mount","mountainpass","upland","highland"
-    ]
+    name:"Mountains",
+    targetWord:"ridge",
+    hint:"Part of the mountain range",
+    words:["peak","valley","summit","slope","ridge","hill","cliff","plateau","mountain","range","crag","outcrop","foothill","alpine","elevation","terrain","mount","mountainpass","upland","highland"]
   }
 ];
 
-// ==== STATE ====
 let dailyTheme = THEMES[0];
 let dailyWord = dailyTheme.targetWord;
-let attrsLeft = 5;
-let finalLeft = 2;
+let attemptsLeft = 5;
 
-// ==== INIT FUNCTION ====
-function initGame() {
-  attrsLeftEl.textContent = attrsLeft;
-  finalLeftEl.textContent = finalLeft;
-  progressBar.style.width = "0%";
-  historyEl.innerHTML = "";
-  invalidMsg.style.opacity = 0;
-  wordHintEl.textContent = "Make your attribute guesses!";
-  hintTextEl.textContent = "";
-  finalArea.style.display = "none";
-  themeName.textContent = dailyTheme.name;
-  attrInput.value = "";
-  finalInput.value = "";
+// ======= STATE =======
+let guessedWords = {};
+
+// ======= INIT =======
+function initGame(){
+  themeNameEl.textContent = dailyTheme.name;
+  attemptsEl.textContent = attemptsLeft;
+  hintDisplay.textContent = "";
+  feedbackEl.textContent = "";
+  guessInput.value = "";
+  guessedWords = {};
 }
 
-// ==== ATTRIBUTE GUESS ====
-function guessAttribute() {
-  let val = attrInput.value.trim().toLowerCase();
-  attrInput.value = "";
-  if (!val) return;
-  if (!dailyTheme.words.includes(val)) {
-    invalidMsg.textContent = "Not a listed word, try again";
-    invalidMsg.style.opacity = 1;
-    setTimeout(() => { invalidMsg.style.opacity = 0 }, 1600);
+// ======= GUESS LOGIC =======
+function guessWord(){
+  let val = guessInput.value.trim().toLowerCase();
+  guessInput.value = "";
+  if(!val) return;
+
+  if(!dailyTheme.words.includes(val)){
+    invalidWord.textContent="Not a listed word, try again";
+    setTimeout(()=>{invalidWord.textContent="";},1600);
     return;
   }
-  attrsLeft--;
-  attrsLeftEl.textContent = attrsLeft;
-  let score = (val === dailyWord) ? 100 : Math.floor(Math.random() * 70) + 30;
-  addHistory(val, score);
-  progressBar.style.width = ((5 - attrsLeft) / 5 * 100) + "%";
-  if (attrsLeft <= 0) finalArea.style.display = "flex";
+
+  // Same word guess returns same score
+  let score;
+  if(guessedWords[val] !== undefined){
+    score = guessedWords[val];
+  } else {
+    score = (val === dailyWord)?100:Math.floor(Math.random()*70)+30;
+    guessedWords[val] = score;
+    attemptsLeft--;
+    attemptsEl.textContent = attemptsLeft;
+  }
+
+  feedbackEl.textContent = `${val} scored ${score}`;
 }
 
-// ==== FINAL GUESS ====
-function finalGuess() {
-  let val = finalInput.value.trim().toLowerCase();
-  finalInput.value = "";
-  if (!val) return;
-  finalLeft--;
-  finalLeftEl.textContent = finalLeft;
-  if (val === dailyWord) {
-    feedback("✅ Correct! You got the hidden word!");
-    return;
-  } else feedback(`❌ Wrong! ${finalLeft} final guesses left`);
-  if (finalLeft <= 0) feedback(`Game Over! The word was "${dailyWord}"`);
-}
+// ======= HINT =======
+hintBtn.addEventListener("click",()=>{hintDisplay.textContent=dailyTheme.hint});
 
-// ==== HISTORY UI ====
-function addHistory(word, score) {
-  let item = document.createElement("div");
-  item.className = "history-item";
-  item.innerHTML = `
-    <div class="guessText">${word}</div>
-    <div class="scoreCell">
-      <div class="scoreBar">
-        <div class="scoreFill" style="width:${score}%;"></div>
-      </div>
-      <div class="scoreLabel">${score}</div>
-    </div>`;
-  historyEl.prepend(item);
-}
+// ======= SUBMIT EVENTS =======
+submitBtn.addEventListener("click",guessWord);
+guessInput.addEventListener("keypress",e=>{if(e.key==="Enter") guessWord()});
 
-// ==== FEEDBACK ====
-function feedback(txt) {
-  document.getElementById("feedback").textContent = txt;
-}
+// ======= MASCOT =======
+mascotBtn.addEventListener("click",()=>{alert("Hi! I'm Chip 🐶");});
 
-// ==== EVENTS ====
-document.getElementById("hintBtn").addEventListener("click", () => {
-  hintTextEl.textContent = dailyTheme.hint;
+// ======= RULES MODAL =======
+closeRules.addEventListener("click",()=>{
+  rulesModal.style.display="none";
 });
-document.getElementById("attrBtn").addEventListener("click", guessAttribute);
-document.getElementById("finalBtn").addEventListener("click", finalGuess);
-attrInput.addEventListener("keypress", (e) => { if (e.key === "Enter") guessAttribute(); });
-finalInput.addEventListener("keypress", (e) => { if (e.key === "Enter") finalGuess(); });
 
+// ======= START GAME =======
 initGame();
+
 
