@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Under the Theme — Homey Edition</title>
+<style>
+:root{
+  --bg:#e6f0e6;
+  --card:#fcfdf5;
+  --muted:#4f4f4f;
+  --accent:#276749;
+  --accent2:#38a169;
+  --danger:#e53e3e;
+  --shadow:0 6px 20px rgba(0,0,0,0.08);
+  --radius:12px;
+}
+body{
+  margin:0;
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:#1a202c;
+  display:flex;
+  justify-content:center;
+  padding:28px;
+}
+.app{
+  max-width:980px;
+  width:100%;
+  background:var(--card);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+header{
+  display:flex; justify-content:space-between; align-items:center;
+}
+h1{
+  font-family:'Merriweather',serif;
+  font-size:24px; margin:0; color:var(--accent);
+}
+.meta{font-size:13px; color:var(--muted);}
+.layout{
+  display:flex; gap:18px; flex-wrap:wrap;
+}
+/* Left */
+.left{
+  flex:0 0 260px;
+  min-width:220px;
+  background:var(--card);
+  border-radius:12px;
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+.themeBox{
+  text-align:center;
+  padding:12px;
+  background:#d8f3dc;
+  border-radius:8px;
+  transform:rotate(-1deg);
+  box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+.themeLabel{font-size:12px; color:var(--muted);}
+.themeName{font-weight:700; font-size:18px; color:var(--accent);}
+.statusRow{display:flex; justify-content:space-between; margin-top:12px; font-size:13px; color:var(--muted);}
+.progressBarContainer{
+  margin-top:14px;
+  height:8px;
+  background:#c6f6d5;
+  border-radius:999px;
+  overflow:hidden;
+}
+.progressBar{height:100%; width:0%; background:linear-gradient(90deg,var(--accent2),var(--accent));}
+/* Center */
+.center{
+  flex:1 1 420px;
+  min-width:280px;
+  background:#f0fdf4;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+.wordHint{font-size:14px; text-align:center; margin-bottom:8px; color:var(--muted);}
+.attr-inputs{
+  display:flex; gap:8px; margin-bottom:10px; align-items:center;
+}
+.attr-inputs input[type="text"]{
+  flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e6eef8; font-size:15px;
+}
+.btn{
+  background:var(--accent2); color:white; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-weight:600;
+}
+.btn.secondary{background:var(--accent); opacity:0.9;}
+.history{margin-top:10px; display:flex; flex-direction:column; gap:8px;}
+.history-item{
+  background:#fcfeff;
+  border-radius:10px;
+  padding:10px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  box-shadow:0 4px 14px rgba(0,0,0,0.04);
+}
+.guessText{font-weight:700; width:110px; text-transform:lowercase; color:#1a202c;}
+.scoreCell{flex:1; display:flex; align-items:center; gap:12px;}
+.scoreBar{height:10px; background:#d8f3dc; border-radius:999px; overflow:hidden;}
+.scoreFill{height:100%; background:linear-gradient(90deg,var(--accent2), var(--accent)); width:0%;}
+.scoreLabel{width:42px; font-weight:700; text-align:right; color:var(--muted); font-size:13px;}
+.final-guess{margin-top:12px; display:flex; gap:8px;}
+.feedback{margin-top:10px; color:var(--muted); font-size:14px; min-height:20px; text-align:center;}
+/* Right */
+.right{
+  flex:0 0 200px;
+  min-width:180px;
+  background:var(--card);
+  border-radius:12px;
+  padding:12px;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.panel-title{font-size:13px; color:var(--muted);}
+.mascot{text-align:center; font-size:42px;}
+.mascot button{margin-top:8px; width:100%; padding:8px; border-radius:8px; border:none; background:#38a169; color:white; font-weight:700; cursor:pointer;}
+footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center;}
+.producer{font-family:'Brush Script MT', cursive; font-weight:700;}
+@media(max-width:860px){.layout{flex-direction:column;}.left,.right{width:100%; max-width:100%;}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1>Under the Theme</h1>
+    <div class="meta">Daily strategic guessing — 3 attribute tries → 2 final guesses</div>
+  </div>
+  <div class="meta" id="dateLabel"></div>
+</header>
+<div class="layout">
+<aside class="left">
+  <div class="themeBox">
+    <div class="themeLabel">Theme (today)</div>
+    <div class="themeName" id="themeName">Loading...</div>
+  </div>
+  <div class="statusRow" style="margin-top:14px">
+    <div>Attributes left</div><div id="attrsLeft">3</div>
+  </div>
+  <div class="statusRow" style="margin-top:8px">
+    <div>Final guesses left</div><div id="finalLeft">2</div>
+  </div>
+  <div class="progressBarContainer">
+    <div id="progressBar" class="progressBar"></div>
+  </div>
+</aside>
+<main class="center">
+  <div class="wordHint" id="wordHint">Make 3 attribute guesses to see numeric proximity (0–100).</div>
+  <div class="attr-inputs">
+    <input id="attrInput" type="text" placeholder="Enter an attribute" autocomplete="off">
+    <button class="btn" id="attrBtn" onclick="submitAttribute()">Guess</button>
+  </div>
+  <div class="history" id="history"></div>
+  <div class="final-guess" id="finalArea" style="display:none">
+    <input id="finalInput" type="text" placeholder="Guess the hidden word">
+    <button class="btn secondary" onclick="submitFinal()" id="finalBtn">Submit Guess</button>
+  </div>
+  <div class="feedback" id="feedback"></div>
+</main>
+<aside class="right">
+  <div>
+    <div class="panel-title">Hint / Strategy</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px">Use attributes smartly — not the obvious single-word match.</div>
+  </div>
+  <div>
+    <div class="panel-title">Mascot</div>
+    <div class="mascot" id="mascot">🐶</div>
+    <button onclick="chipRun()">Press Me — Chip</button>
+  </div>
+</aside>
+</div>
+<footer>
+  <div class="producer">Produced by the greatest game player of all time</div>
+  <div class="meta" id="seedInfo"></div>
+</footer>
+</div>
+<script>
+/* ------------------- DATA ------------------- */
+const THEMES = [
+{
+  name:"Mountains & Earth",
+  targetWords:["volcano","magma","tectonic","caldera","geyser"],
+  attributeMap:{
+    "lava":85,"rock":60,"mountain":70,"crust":50,"plate":65,"ash":80,"ridge":55,"valley":40,
+    "fault":75,"pressure":60,"peak":50,"magma":95,"volcano":100,"caldera":90,"geyser":88,
+    "boulder":55,"summit":60,"slope":50,"soil":45,"erosion":55,"peak":50,"cliff":60,
+    "ravine":45,"fumarole":75,"tectonic":90,"moraine":65,"strata":55,"seismic":70,"melt":60,
+    "igneous":65,"basalt":60,"andesite":60,"lavaflow":80,"ashcloud":75,"volcanic":85,"plume":65,
+    "crater":85,"lavafield":75,"volcanism":90,"hotspot":70,"geothermal":70,"lavaflow":80,"erupt":80,
+    "molten":75,"scoria":70,"cinder":65,"pyroclast":60,"dome":60,"lavaTube":65,"pahoehoe":70,"aa":70,
+    "lavaRock":65,"vent":60,"magmatic":75,"calderaLake":60,"tephra":65,"ashfall":60,"lavaPlateau":70,
+    "floodBasalt":65,"lavaBomb":60,"volcanicRock":85,"volcanoes":85,"lavaDome":70,"lavaFlow":75,
+    "lavaField":75,"lavaCave":60,"lavaRiver":65,"lavaDeposit":60,"lavaTubeCave":65,"plutonic":50,
+    "batholith":50,"dike":55,"sill":55,"volcaniclastic":65,"lavaVent":70,"volcanicGas":65,"lavaBlast":60,
+    "lavaCone":75,"pyroclasticFlow":80,"lavaPlate":65,"volcanicAsh":70,"lavaRockFragment":60,"eruptive":75,
+    "lavaRockType":65,"lavaDomeFlow":70
+  }
+}
+// other themes can be added similarly
+];
+/* ------------------- DATE / DAILY SEED ------------------- */
+const START_DATE = new Date(2025,0,1);
+const today = new Date();
+const diffDays = Math.floor((today - START_DATE)/(1000*60*60*24));
+document.getElementById("dateLabel").textContent = today.toDateString();
+/* ------------------- GAME STATE ------------------- */
+let dailyTheme = THEMES[diffDays % THEMES.length];
+let dailyWord = dailyTheme.targetWords[diffDays % dailyTheme.targetWords.length];
+let attrsLeft = 3;
+let finalLeft = 2;
+let historyEl = document.getElementById("history");
+let attrInput = document.getElementById("attrInput");
+let finalInput = document.getElementById("finalInput");
+document.getElementById("themeName").textContent = dailyTheme.name;
+/* ------------------- FUNCTIONS ------------------- */
+function getScore(word){
+  word = word.toLowerCase();
+  if(dailyTheme.attributeMap[word]!==undefined) return dailyTheme.attributeMap[word];
+  // approximate: 2/3 letter overlap + 10% theme bonus
+  let overlap = 0;
+  for(let c of word) if(dailyWord.includes(c)) overlap++;
+  let val = Math.floor(overlap/Math.max(word.length,dailyWord.length)*100);
+  return Math.min(val,99);
+}
+function submitAttribute(){
+  let val = attrInput.value.trim().toLowerCase();
+  if(!val){return;}
+  let score = getScore(val);
+  historyEl.innerHTML += `<div class="history-item">
+    <div class="guessText">${val}</div>
+    <div class="scoreCell">
+      <div class="scoreBar"><div class="scoreFill" style="width:${score}%"></div></div>
+      <div class="scoreLabel">${score}</div>
+    </div>
+  </div>`;
+  attrsLeft--;
+  document.getElementById("attrsLeft").textContent = attrsLeft;
+  attrInput.value="";
+  if(attrsLeft<=0){
+    document.getElementById("finalArea").style.display="flex";
+    attrInput.disabled=true;
+    document.getElementById("attrBtn").disabled=true;
+    document.getElementById("feedback").textContent="Make final guesses for the hidden word!";
+  }
+  updateProgress();
+}
+function submitFinal(){
+  let val = finalInput.value.trim().toLowerCase();
+  if(!val){return;}
+  finalLeft--;
+  document.getElementById("finalLeft").textContent = finalLeft;
+  if(val===dailyWord){
+    document.getElementById("feedback").textContent="🎉 Correct! The hidden word was: "+dailyWord;
+    finalInput.disabled=true; document.getElementById("finalBtn").disabled=true;
+  }else if(finalLeft<=0){
+    document.getElementById("feedback").textContent="❌ Out of guesses! The hidden word was: "+dailyWord;
+    finalInput.disabled=true; document.getElementById("finalBtn").disabled=true;
+  }else{
+    document.getElementById("feedback").textContent=`Wrong! You have ${finalLeft} final guesses left.`;
+  }
+  finalInput.value="";
+}
+function updateProgress(){
+  let total = 3+2; // attr + final
+  let done = 3-attrsLeft + (2-finalLeft);
+  document.getElementById("progressBar").style.width=Math.floor(done/total*100)+"%";
+}
+function chipRun(){
+  let chip = document.getElementById("mascot");
+  chip.textContent="Hi, I'm Chip! 🐕‍🦺";
+  setTimeout(()=>{chip.textContent="🐶";},1800);
+}
+</script>
+</body>
+</html>
