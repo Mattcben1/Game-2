@@ -1,46 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Theme Guess Game</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Under the Theme — Fast Version</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="container">
+  <div class="app">
     <header>
-      <h1>Theme Guess</h1>
-      <button id="admin-key" title="Admin Access">🔑</button>
+      <div>
+        <h1>Under the Theme</h1>
+        <div class="meta">5 attribute guesses → 2 final word guesses</div>
+      </div>
+      <div id="adminKey" title="Admin Key">🔑</div>
     </header>
 
-    <section id="game-area">
-      <h2 id="theme-display">Theme: <span id="theme-name"></span></h2>
-      <p id="hint-display"></p>
+    <div class="layout">
+      <aside class="left">
+        <div class="themeBox">
+          <div class="themeLabel">Theme (today)</div>
+          <div class="themeName" id="themeName">Loading...</div>
+        </div>
+        <div class="statusRow"><div>Attributes left</div><div id="attrsLeft">5</div></div>
+        <div class="statusRow"><div>Final guesses left</div><div id="finalLeft">2</div></div>
+        <div class="progressBarContainer"><div id="progressBar" class="progressBar"></div></div>
+      </aside>
 
-      <div id="guess-box">
-        <input type="text" id="guess-input" placeholder="Type your guess..." />
-        <button id="submit-guess">Guess</button>
-        <p id="invalid-word"></p>
-      </div>
+      <main class="center">
+        <div class="wordHint" id="wordHint">Make your attribute guesses!</div>
+        <div class="attr-inputs">
+          <input id="attrInput" type="text" placeholder="Enter an attribute" autocomplete="off">
+          <button class="btn" id="attrBtn">Guess</button>
+          <button class="btn secondary" id="hintBtn">Get Hint</button>
+          <span class="invalidMsg" id="invalidMsg"></span>
+        </div>
+        <div class="history" id="history"></div>
+        <div class="final-guess" id="finalArea" style="display:none">
+          <input id="finalInput" type="text" placeholder="Guess the hidden word">
+          <button class="btn secondary" id="finalBtn">Submit Guess</button>
+        </div>
+        <div class="feedback" id="feedback"></div>
+      </main>
 
-      <p id="feedback"></p>
-      <p id="attempts">Attempts Left: <span id="attempt-count"></span></p>
-      <button id="hint-button">Get Hint</button>
-    </section>
+      <aside class="right">
+        <div>
+          <div class="panel-title">Hint / Strategy</div>
+          <div id="hintText" style="font-size:13px;color:var(--muted);margin-top:6px"></div>
+        </div>
+        <div>
+          <div class="panel-title">Mascot</div>
+          <div class="mascot" id="mascot">🐶</div>
+          <button id="chipBtn">Press Me — Chip</button>
+        </div>
+        <div class="adminDropdown" id="adminDropdown"></div>
+      </aside>
+    </div>
 
     <footer>
-      <p>Produced by the greatest game player of all time 🏆</p>
+      <div class="producer">Produced by the greatest game player of all time</div>
     </footer>
   </div>
 
-  <div id="admin-panel" class="hidden">
-    <div class="panel-content">
-      <h3>Admin Control</h3>
-      <select id="theme-selector"></select>
-      <button id="set-theme">Set Theme</button>
-    </div>
-  </div>
-
   <script src="script.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
+
