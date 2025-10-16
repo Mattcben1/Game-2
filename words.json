@@ -1,0 +1,14 @@
+{
+  "Nature": {
+    "hint": "Think of Earth's features and forces.",
+    "words": ["mountain", "valley", "volcano", "tree", "forest", "river", "desert", "lake", "waterfall", "glacier", "plateau", "hill", "field", "rock", "stone", "cliff", "ocean", "sand", "rain", "wind", "cloud"]
+  },
+  "Space": {
+    "hint": "Look up when it’s dark outside.",
+    "words": ["planet", "star", "galaxy", "asteroid", "comet", "meteor", "moon", "sun", "orbit", "blackhole", "nebula", "gravity", "rocket", "satellite", "eclipse", "cosmos", "universe"]
+  },
+  "Ocean": {
+    "hint": "You’ll need a boat for this one.",
+    "words": ["wave", "coral", "fish", "shark", "whale", "dolphin", "crab", "octopus", "seaweed", "jellyfish", "plankton", "tide", "reef", "current", "anchor"]
+  }
+}

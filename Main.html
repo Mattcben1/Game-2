@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Theme Guess Game</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Theme Guess</h1>
+      <button id="admin-key" title="Admin Access">🔑</button>
+    </header>
+
+    <section id="game-area">
+      <h2 id="theme-display">Theme: <span id="theme-name"></span></h2>
+      <p id="hint-display"></p>
+
+      <div id="guess-box">
+        <input type="text" id="guess-input" placeholder="Type your guess..." />
+        <button id="submit-guess">Guess</button>
+        <p id="invalid-word"></p>
+      </div>
+
+      <p id="feedback"></p>
+      <p id="attempts">Attempts Left: <span id="attempt-count"></span></p>
+      <button id="hint-button">Get Hint</button>
+    </section>
+
+    <footer>
+      <p>Produced by the greatest game player of all time 🏆</p>
+    </footer>
+  </div>
+
+  <div id="admin-panel" class="hidden">
+    <div class="panel-content">
+      <h3>Admin Control</h3>
+      <select id="theme-selector"></select>
+      <button id="set-theme">Set Theme</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

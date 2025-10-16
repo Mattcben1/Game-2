@@ -1,0 +1,94 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to bottom right, #d9e6cf, #b8d3b0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 30px 40px;
+  width: 450px;
+  text-align: center;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#admin-key {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+#guess-box {
+  margin-top: 15px;
+}
+
+#guess-input {
+  padding: 10px;
+  width: 70%;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+}
+
+#submit-guess, #hint-button {
+  background: #3b7a3b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 10px 5px;
+  cursor: pointer;
+}
+
+#submit-guess:hover, #hint-button:hover {
+  background: #326332;
+}
+
+#invalid-word {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 6px;
+  min-height: 20px;
+}
+
+footer {
+  margin-top: 30px;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+#admin-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.panel-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.hidden {
+  display: none;
+}
