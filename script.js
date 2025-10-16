@@ -81,31 +81,38 @@ function getSimilarityScore(a, b) {
   return Math.round((matches / len) * 100);
 }
 
-// Admin system
-const adminKey = document.getElementById("admin-key");
+const adminButton = document.getElementById("admin-key");
 const adminPanel = document.getElementById("admin-panel");
 const themeSelector = document.getElementById("theme-selector");
-const setThemeBtn = document.getElementById("set-theme");
+const setThemeButton = document.getElementById("set-theme");
 
-adminKey.addEventListener("click", () => {
-  const pin = prompt("Enter admin code:");
-  if (pin === "1234") {
-    adminPanel.classList.remove("hidden");
-    themeSelector.innerHTML = Object.keys(THEMES)
-      .map(t => `<option value="${t}">${t}</option>`)
-      .join("");
+adminButton.addEventListener("click", () => {
+  const code = prompt("Enter admin key:");
+  if (code === "1234") {
+    adminPanel.classList.remove("hidden"); // Show the panel
   } else {
-    alert("Incorrect PIN.");
+    alert("Incorrect key!");
   }
 });
 
-setThemeBtn.addEventListener("click", () => {
-  const selected = themeSelector.value;
-  currentTheme = selected;
-  correctWord = THEMES[currentTheme].words[Math.floor(Math.random() * THEMES[currentTheme].words.length)];
-  adminPanel.classList.add("hidden");
-  usedHint = false;
-  attemptsLeft = 5;
-  startRandomTheme();
+setThemeButton.addEventListener("click", () => {
+  const selectedTheme = themeSelector.value;
+  if (selectedTheme) {
+    // Save selected theme to local storage so all devices see it later
+    localStorage.setItem("currentTheme", selectedTheme);
+    alert(`Theme set to: ${selectedTheme}`);
+    location.reload(); // Reload page with new theme
+  }
 });
 
+// When the page loads, load the selected theme (if any)
+window.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("currentTheme");
+  if (savedTheme) {
+    // Apply saved theme logic here, e.g. setTheme(savedTheme);
+    console.log("Loaded theme:", savedTheme);
+  }
+
+  // Hide the panel by default
+  adminPanel.classList.add("hidden");
+});
