@@ -1,4 +1,4 @@
-# 🌎 Theme Me — A Strategic Word Guessing Game
+# Theme Me — A Strategic Word Guessing Game
 
 **Theme Me** is an interactive word-guessing game that challenges players to deduce a hidden word based on a daily **theme**.  
 Each player gets limited guesses and numeric feedback that tells them *how close* they are to the secret word (0–100).  
@@ -6,7 +6,7 @@ Think *Wordle* meets *Categories* — but with a strategic, thematic twist.
 
 ---
 
-## 🎮 How to Play
+## How to Play
 
 1. **You’re given a theme** (e.g., *Mountains*, *Oceans*, *Space*).
 2. **Guess words** related to that theme.
@@ -17,18 +17,18 @@ Think *Wordle* meets *Categories* — but with a strategic, thematic twist.
 
 ---
 
-## 🧠 Game Features
+##  Game Features
 
-- 🌿 **Themes with Depth:** Each theme has 150–200 related words of varying similarity.
-- 💬 **Numeric Feedback:** No vague hints — just raw 0–100 proximity scores.
-- 🗝️ **Admin Access:** Enter the secret key (`1234`) to access the theme selector dropdown.
-- ⚙️ **Smart Word Validation:** Invalid words don’t count toward your guesses.
-- 🎨 **Earthy, Minimal Design:** A clean interface that emphasizes simplicity and focus.
-- 🚀 **Daily Play:** Each day brings a fresh word and theme.
+-  **Themes with Depth:** Each theme has 150–200 related words of varying similarity.
+-  **Numeric Feedback:** No vague hints — just raw 0–100 proximity scores.
+-  **Admin Access:** Enter the secret key (`1234`) to access the theme selector dropdown.
+-  **Smart Word Validation:** Invalid words don’t count toward your guesses.
+-  **Earthy, Minimal Design:** A clean interface that emphasizes simplicity and focus.
+-  **Daily Play:** Each day brings a fresh word and theme.
 
 ---
 
-## 🧩 Technologies Used
+## Technologies Used
 
 - **HTML5**
 - **CSS3**
@@ -37,7 +37,7 @@ Think *Wordle* meets *Categories* — but with a strategic, thematic twist.
 
 ---
 
-## 🧑‍💻 Developer Mode
+## Developer Mode
 
 To change the current theme or word list:
 1. Click the **key icon** in the top-right corner.
@@ -47,7 +47,7 @@ To change the current theme or word list:
 
 ---
 
-## ⚡ Setup Instructions
+## Setup Instructions
 
 If you’d like to run the game locally:
 
