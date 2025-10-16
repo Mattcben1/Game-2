@@ -12,12 +12,11 @@ const hintDisplay = document.getElementById("hint-display");
 const attemptCount = document.getElementById("attempt-count");
 const hintButton = document.getElementById("hint-button");
 
-fetch("words.json")
-  .then(res => res.json())
-  .then(data => {
-    THEMES = data;
-    startRandomTheme();
-  });
+fetch('./words.json')
+    .then(response => response.json())
+    .then(data => {
+        // do stuff
+    });
 
 function startRandomTheme() {
   const themeKeys = Object.keys(THEMES);
@@ -109,3 +108,4 @@ setThemeBtn.addEventListener("click", () => {
   attemptsLeft = 5;
   startRandomTheme();
 });
+
