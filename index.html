@@ -2,160 +2,122 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Under the Theme — Enhanced Animated Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Under the Theme — Functional Edition</title>
 <style>
-:root{
-  --bg:#eaf0ea;
-  --card:#fcfdf5;
-  --muted:#4f4f4f;
-  --accent:#276749;
-  --accent2:#38a169;
-  --danger:#e53e3e;
-  --shadow:0 8px 24px rgba(0,0,0,0.12);
-  --radius:14px;
+:root {
+  --bg: #eaf0ea;
+  --card: #fcfdf5;
+  --muted: #4f4f4f;
+  --accent: #276749;
+  --accent2: #38a169;
+  --danger: #e53e3e;
+  --shadow: 0 8px 24px rgba(0,0,0,0.12);
+  --radius: 14px;
 }
-body{
-  margin:0;
-  font-family:'Nunito',sans-serif;
-  background:var(--bg);
-  color:#1a202c;
-  display:flex;
-  justify-content:center;
-  padding:24px;
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: #1a202c;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
 }
-.app{
-  max-width:980px;
-  width:100%;
-  background:var(--card);
-  border-radius:18px;
-  padding:20px;
-  box-shadow:var(--shadow);
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  position:relative;
-  overflow:hidden;
+.app {
+  max-width: 980px;
+  width: 100%;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-header{
-  display:flex; justify-content:space-between; align-items:center;
+header {
+  display: flex; justify-content: space-between; align-items: center;
 }
-h1{
-  font-family:'Merriweather',serif;
-  font-size:26px; margin:0; color:var(--accent);
+h1 {
+  font-family: 'Merriweather', serif;
+  font-size: 26px;
+  margin: 0;
+  color: var(--accent);
 }
-.meta{font-size:13px; color:var(--muted);}
-#adminKey{
-  font-size:22px; cursor:pointer; color:var(--accent2); user-select:none;
+.meta { font-size: 13px; color: var(--muted); }
+#adminKey {
+  font-size: 22px; cursor: pointer; color: var(--accent2); user-select: none;
 }
-.layout{
-  display:flex; gap:18px; flex-wrap:wrap;
+.layout {
+  display: flex; gap: 18px; flex-wrap: wrap;
 }
-.left{
-  flex:0 0 260px;
-  min-width:220px;
-  background:var(--card);
-  border-radius:14px;
-  padding:14px;
-  box-shadow:var(--shadow);
-  transform:translateZ(0);
+.left {
+  flex: 0 0 260px;
+  min-width: 220px;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--shadow);
 }
-.themeBox{
-  text-align:center;
-  padding:12px;
-  background:#d8f3dc;
-  border-radius:8px;
-  transform:rotate(-1deg);
-  box-shadow:0 4px 14px rgba(0,0,0,0.08);
+.themeBox {
+  text-align: center;
+  padding: 12px;
+  background: #d8f3dc;
+  border-radius: 8px;
 }
-.themeLabel{font-size:12px; color:var(--muted);}
-.themeName{font-weight:700; font-size:18px; color:var(--accent);}
-.statusRow{display:flex; justify-content:space-between; margin-top:12px; font-size:13px; color:var(--muted);}
-.progressBarContainer{
-  margin-top:14px;
-  height:8px;
-  background:#c6f6d5;
-  border-radius:999px;
-  overflow:hidden;
+.themeLabel { font-size: 12px; color: var(--muted); }
+.themeName { font-weight: 700; font-size: 18px; color: var(--accent); }
+.statusRow { display: flex; justify-content: space-between; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.progressBarContainer { margin-top: 14px; height: 8px; background: #c6f6d5; border-radius: 999px; overflow: hidden; }
+.progressBar { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent2), var(--accent)); transition: width 0.5s ease; }
+.center {
+  flex: 1 1 420px;
+  min-width: 280px;
+  background: #f0fdf4;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow);
 }
-.progressBar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,var(--accent2),var(--accent));
-  transition:width 0.5s ease;
+.wordHint { font-size: 14px; text-align: center; margin-bottom: 8px; color: var(--muted); }
+.attr-inputs {
+  display: flex; gap: 8px; margin-bottom: 10px; align-items: center;
 }
-.center{
-  flex:1 1 420px;
-  min-width:280px;
-  background:#f0fdf4;
-  border-radius:14px;
-  padding:16px;
-  box-shadow:var(--shadow);
-  position:relative;
-  overflow:hidden;
+.attr-inputs input[type="text"] {
+  flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid #e6eef8; font-size: 15px;
 }
-.animated-bg{
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  z-index:0; pointer-events:none;
+.btn {
+  background: var(--accent2); color: white; border: none; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;
 }
-.wordHint{font-size:14px; text-align:center; margin-bottom:8px; color:var(--muted); position:relative; z-index:1;}
-.attr-inputs{
-  display:flex; gap:8px; margin-bottom:10px; align-items:center; position:relative; z-index:1;
+.btn:hover { opacity: 0.85; }
+.btn.secondary { background: var(--accent); opacity: 0.9; }
+.history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.history-item { background: #fcfeff; border-radius: 10px; padding: 10px; display: flex; gap: 12px; align-items: center; }
+.guessText { font-weight: 700; width: 110px; text-transform: lowercase; color: #1a202c; }
+.scoreCell { flex: 1; display: flex; align-items: center; gap: 12px; }
+.scoreBar { height: 10px; background: #d8f3dc; border-radius: 999px; overflow: hidden; }
+.scoreFill { height: 100%; background: linear-gradient(90deg,var(--accent2), var(--accent)); width: 0%; transition: width 0.5s; }
+.scoreLabel { width: 42px; font-weight: 700; text-align: right; color: var(--muted); font-size: 13px; }
+.invalidMsg { color: var(--danger); font-size: 13px; margin-left: 6px; opacity: 0; transition: opacity 0.5s; }
+.final-guess { margin-top: 12px; display: flex; gap: 8px; }
+.feedback { margin-top: 10px; color: var(--muted); font-size: 14px; min-height: 20px; text-align: center; }
+.right {
+  flex: 0 0 200px;
+  min-width: 180px;
+  background: var(--card);
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-.attr-inputs input[type="text"]{
-  flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e6eef8; font-size:15px;
-  transition:border-color 0.3s;
-}
-.attr-inputs input[type="text"]:focus{border-color:var(--accent2);}
-.btn{
-  background:var(--accent2); color:white; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-weight:600;
-  transition:opacity 0.3s;
-}
-.btn:hover{opacity:0.85;}
-.btn.secondary{background:var(--accent); opacity:0.9;}
-.history{margin-top:10px; display:flex; flex-direction:column; gap:8px; position:relative; z-index:1;}
-.history-item{
-  background:#fcfeff;
-  border-radius:10px;
-  padding:10px;
-  display:flex;
-  gap:12px;
-  align-items:center;
-  box-shadow:0 4px 14px rgba(0,0,0,0.06);
-  transform:translateX(-20px);
-  opacity:0;
-  animation:slideIn 0.4s forwards;
-}
-@keyframes slideIn{
-  to{transform:translateX(0); opacity:1;}
-}
-.guessText{font-weight:700; width:110px; text-transform:lowercase; color:#1a202c;}
-.scoreCell{flex:1; display:flex; align-items:center; gap:12px;}
-.scoreBar{height:10px; background:#d8f3dc; border-radius:999px; overflow:hidden;}
-.scoreFill{height:100%; background:linear-gradient(90deg,var(--accent2), var(--accent)); width:0%; transition:width 0.5s;}
-.scoreLabel{width:42px; font-weight:700; text-align:right; color:var(--muted); font-size:13px;}
-.invalidMsg{color:var(--danger); font-size:13px; margin-left:6px; transition:opacity 0.5s;}
-.final-guess{margin-top:12px; display:flex; gap:8px; position:relative; z-index:1;}
-.feedback{margin-top:10px; color:var(--muted); font-size:14px; min-height:20px; text-align:center; position:relative; z-index:1;}
-.right{
-  flex:0 0 200px;
-  min-width:180px;
-  background:var(--card);
-  border-radius:14px;
-  padding:12px;
-  box-shadow:var(--shadow);
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.panel-title{font-size:13px; color:var(--muted);}
-.mascot{text-align:center; font-size:42px; position:relative;}
-.mascot button{margin-top:8px; width:100%; padding:8px; border-radius:8px; border:none; background:#38a169; color:white; font-weight:700; cursor:pointer; transition:transform 0.3s;}
-.mascot button:hover{transform:scale(1.05);}
-.adminDropdown{margin-top:6px; display:none; flex-direction:column; gap:6px;}
-.adminDropdown button{padding:6px 8px; border-radius:6px; border:none; background:#e0f2f1; color:var(--accent2); cursor:pointer;}
-footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center;}
-.producer{font-family:'Brush Script MT', cursive; font-weight:700;}
+.panel-title { font-size: 13px; color: var(--muted); }
+.mascot { text-align: center; font-size: 42px; }
+.mascot button { margin-top: 8px; width: 100%; padding: 8px; border-radius: 8px; border: none; background: #38a169; color: white; font-weight: 700; cursor: pointer; }
+.adminDropdown { margin-top: 6px; display: none; flex-direction: column; gap: 6px; }
+.adminDropdown button { padding: 6px 8px; border-radius: 6px; border: none; background: #e0f2f1; color: var(--accent2); cursor: pointer; }
+footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+.producer { font-family: 'Brush Script MT', cursive; font-weight: 700; }
 @media(max-width:860px){.layout{flex-direction:column;}.left,.right{width:100%; max-width:100%;}}
 </style>
 </head>
@@ -164,7 +126,7 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
 <header>
   <div>
     <h1>Under the Theme</h1>
-    <div class="meta">Daily strategic guessing — 5 attribute tries → 2 final guesses</div>
+    <div class="meta">5 attribute guesses → 2 final word guesses</div>
   </div>
   <div id="adminKey" title="Admin Key">🔑</div>
 </header>
@@ -185,11 +147,11 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
   </div>
 </aside>
 <main class="center">
-  <canvas class="animated-bg" id="animatedBg"></canvas>
-  <div class="wordHint" id="wordHint">Make 5 attribute guesses to see numeric proximity (0–100).</div>
+  <div class="wordHint" id="wordHint">Make your attribute guesses!</div>
   <div class="attr-inputs">
     <input id="attrInput" type="text" placeholder="Enter an attribute" autocomplete="off">
     <button class="btn" id="attrBtn">Guess</button>
+    <button class="btn secondary" id="hintBtn">Get Hint</button>
     <span class="invalidMsg" id="invalidMsg"></span>
   </div>
   <div class="history" id="history"></div>
@@ -202,7 +164,7 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
 <aside class="right">
   <div>
     <div class="panel-title">Hint / Strategy</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:6px" id="hintText"></div>
+    <div id="hintText" style="font-size:13px;color:var(--muted);margin-top:6px"></div>
   </div>
   <div>
     <div class="panel-title">Mascot</div>
@@ -217,25 +179,25 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
 </footer>
 
 <script>
-// === THEME DATA ===
+// ===== THEME DATA =====
 const THEMES = [
   {
-    name: "Mountains & Earth",
-    targetWord: "volcano",
-    hint: "Rugged landforms shaped by tectonic activity",
-    attributeMap: {lava:80, rock:60, eruption:90, hill:40, magma:70, slope:50}
+    name:"Mountains & Earth",
+    targetWord:"volcano",
+    hint:"Rugged landforms shaped by tectonic activity",
+    attributeMap: generateWords(["lava","rock","eruption","magma","hill","slope","ash","crater","mountain","ridge","plateau"],200)
   },
   {
-    name: "Oceans & Sea Life",
-    targetWord: "coral",
-    hint: "Colorful underwater ecosystem engineers",
-    attributeMap: {reef:90, fish:70, algae:60, polyp:100, wave:40, shell:55, plankton:50}
+    name:"Oceans & Sea Life",
+    targetWord:"coral",
+    hint:"Colorful underwater ecosystem engineers",
+    attributeMap: generateWords(["reef","fish","algae","polyp","wave","shell","plankton","sea","tide","current"],200)
   },
   {
-    name: "Weather & Atmosphere",
-    targetWord: "tornado",
-    hint: "Twisting destructive wind phenomenon",
-    attributeMap: {storm:80, funnel:90, wind:100, rain:60, lightning:50, cloud:40, vortex:85}
+    name:"Weather & Atmosphere",
+    targetWord:"tornado",
+    hint:"Twisting destructive wind phenomenon",
+    attributeMap: generateWords(["storm","funnel","wind","rain","lightning","cloud","vortex","gust","hurricane","cyclone"],200)
   }
 ];
 let dailyThemeIndex = 0;
@@ -245,14 +207,25 @@ let attrsLeft = 5;
 let finalLeft = 2;
 let historyEl = document.getElementById("history");
 
-// === INIT ===
+// ===== HELPER: Generate large dictionary with random weights =====
+function generateWords(baseWords,count){
+  let obj={};
+  while(Object.keys(obj).length<count){
+    baseWords.forEach(w=>{
+      if(Object.keys(obj).length<count)obj[w+(Math.random()*1000|0)] = Math.floor(Math.random()*100);
+    });
+  }
+  return obj;
+}
+
+// ===== INIT GAME =====
 function initGame(){
-  document.getElementById("themeName").textContent = dailyTheme.name;
-  document.getElementById("attrsLeft").textContent = attrsLeft;
-  document.getElementById("finalLeft").textContent = finalLeft;
+  document.getElementById("themeName").textContent=dailyTheme.name;
+  document.getElementById("attrsLeft").textContent=attrsLeft;
+  document.getElementById("finalLeft").textContent=finalLeft;
   document.getElementById("feedback").textContent="";
   document.getElementById("hintText").textContent="";
-  document.getElementById("wordHint").textContent="Make 5 attribute guesses to see numeric proximity (0–100).";
+  document.getElementById("wordHint").textContent="Make your attribute guesses!";
   historyEl.innerHTML="";
   document.getElementById("attrInput").disabled=false;
   document.getElementById("attrBtn").disabled=false;
@@ -263,26 +236,21 @@ function initGame(){
 }
 initGame();
 
-// === CHIP MASCOT ANIMATION ===
+// ===== CHIP MASCOT =====
 function chipRun(){
   let chip=document.getElementById("mascot");
-  chip.style.transition="transform 2s linear";
   chip.textContent="Hi, I'm Chip! 🐕‍🦺";
-  chip.style.transform="translateX(80%)";
-  setTimeout(()=>{
-    chip.textContent="🐶";
-    chip.style.transform="translateX(0)";
-  },2000);
+  setTimeout(()=>{chip.textContent="🐶";},2000);
 }
 document.getElementById("chipBtn").addEventListener("click",chipRun);
 
-// === ATTRIBUTE GUESS ===
+// ===== ATTRIBUTE GUESS =====
 function guessAttribute(){
   let val=document.getElementById("attrInput").value.toLowerCase().trim();
   let invalidMsg=document.getElementById("invalidMsg");
-  invalidMsg.style.opacity="1";
   if(!dailyTheme.attributeMap[val]){
     invalidMsg.textContent="❌ Not a listed word, try again";
+    invalidMsg.style.opacity="1";
     document.getElementById("attrInput").value="";
     setTimeout(()=>{invalidMsg.style.opacity="0";},2000);
     return;
@@ -297,7 +265,7 @@ function guessAttribute(){
   document.getElementById("attrInput").value="";
 }
 
-// === HISTORY ===
+// ===== HISTORY =====
 function addHistoryItem(word,score){
   let div=document.createElement("div"); div.className="history-item";
   div.innerHTML=`<div class="guessText">${word}</div>
@@ -306,7 +274,7 @@ function addHistoryItem(word,score){
   historyEl.prepend(div);
 }
 
-// === FINAL GUESS ===
+// ===== FINAL GUESS =====
 function finalGuess(){
   let val=document.getElementById("finalInput").value.toLowerCase().trim();
   finalLeft--;
@@ -324,14 +292,14 @@ function finalGuess(){
   updateProgress();
 }
 
-// === PROGRESS BAR ===
+// ===== PROGRESS BAR =====
 function updateProgress(){
   let total=5+2;
   let done=5-attrsLeft+(2-finalLeft);
   document.getElementById("progressBar").style.width=Math.floor(done/total*100)+"%";
 }
 
-// === ADMIN KEY ===
+// ===== ADMIN KEY =====
 document.getElementById("adminKey").addEventListener("click",()=>{
   let pin=prompt("Enter Admin PIN:");
   if(pin==="1234"){
@@ -355,12 +323,12 @@ function loadTheme(index){
   initGame();
 }
 
-// === LOAD LAST THEME FROM STORAGE ===
+// ===== LOAD LAST THEME =====
 if(localStorage.getItem("themeIndex")){
   loadTheme(parseInt(localStorage.getItem("themeIndex")));
 }
 
-// === ENTER KEY SUBMISSION ===
+// ===== ENTER KEY =====
 document.getElementById("attrInput").addEventListener("keypress",(e)=>{
   if(e.key==="Enter"){guessAttribute();}
 });
@@ -370,57 +338,11 @@ document.getElementById("finalInput").addEventListener("keypress",(e)=>{
 document.getElementById("attrBtn").addEventListener("click",guessAttribute);
 document.getElementById("finalBtn").addEventListener("click",finalGuess);
 
-// === ANIMATED BACKGROUND ===
-const canvas = document.getElementById("animatedBg");
-const ctx = canvas.getContext("2d");
-canvas.width=canvas.offsetWidth;
-canvas.height=canvas.offsetHeight;
-
-function drawBg(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  let time = Date.now()*0.002;
-  if(dailyTheme.name.includes("Mountains")){
-    for(let i=0;i<4;i++){
-      let h = canvas.height/2 + 20*i + Math.sin(time+i)*12;
-      ctx.fillStyle = `rgba(${50+40*i}, ${100+20*i}, 80, 0.4)`;
-      ctx.beginPath();
-      ctx.moveTo(0,canvas.height);
-      ctx.lineTo(canvas.width/2, canvas.height-h);
-      ctx.lineTo(canvas.width, canvas.height);
-      ctx.fill();
-    }
-    // clouds
-    for(let j=0;j<6;j++){
-      ctx.fillStyle=`rgba(255,255,255,${0.2+0.1*Math.sin(time+j)})`;
-      ctx.beginPath();
-      ctx.arc((time*30+j*120)%canvas.width,50+20*Math.sin(time+j),25,0,2*Math.PI);
-      ctx.fill();
-    }
-  }else if(dailyTheme.name.includes("Oceans")){
-    // waves
-    for(let i=0;i<5;i++){
-      ctx.fillStyle = `rgba(56,161,105,${0.2+0.05*i})`;
-      ctx.beginPath();
-      ctx.moveTo(0,canvas.height/2+20*i+Math.sin(time+i)*15);
-      for(let x=0;x<canvas.width;x+=10){
-        ctx.lineTo(x,canvas.height/2+20*i+Math.sin(x/20+time+i)*15);
-      }
-      ctx.lineTo(canvas.width,canvas.height);
-      ctx.lineTo(0,canvas.height);
-      ctx.fill();
-    }
-  }else if(dailyTheme.name.includes("Weather")){
-    // clouds
-    for(let j=0;j<8;j++){
-      ctx.fillStyle=`rgba(200,200,220,${0.2+0.1*Math.sin(time+j)})`;
-      ctx.beginPath();
-      ctx.arc((time*40+j*90)%canvas.width,60+20*Math.sin(time+j),30,0,2*Math.PI);
-      ctx.fill();
-    }
-  }
-  requestAnimationFrame(drawBg);
-}
-drawBg();
+// ===== HINT BUTTON =====
+document.getElementById("hintBtn").addEventListener("click",()=>{
+  document.getElementById("hintText").textContent=dailyTheme.hint;
+});
 </script>
 </body>
 </html>
+
