@@ -3,63 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MindTrail</title>
+<title>Theme Explorer</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<!-- RULES MODAL -->
-<div id="rules-modal" class="modal">
-  <div class="modal-content">
-    <h2>Welcome to MindTrail!</h2>
-    <p>How to Play:</p>
-    <ul>
-      <li>Guess 5 attributes related to the theme.</li>
-      <li>After that, you have 2 chances to guess the main word.</li>
-      <li>Get a hint by pressing the "Get Hint" button (shown above the guess box).</li>
-    </ul>
-    <button id="close-rules">Start Game</button>
-  </div>
-</div>
-
-<div class="container">
+<div class="app">
   <header>
-    <h1>MindTrail</h1>
-    <button id="admin-key" title="Admin Access">🔑</button>
+    <h1 id="game-title">Theme Explorer</h1>
+    <div id="adminKey" title="Admin Key">🔑</div>
   </header>
 
-  <section id="game-area">
-    <h2 id="theme-display">Theme: <span id="theme-name"></span></h2>
+  <div class="theme-display">
+    <span id="themeName">Loading...</span>
+  </div>
 
-    <p id="hint-display"></p>
-
-    <div id="guess-box">
-      <input type="text" id="guess-input" placeholder="Type your guess..." autocomplete="off" />
-      <button id="submit-guess">Guess</button>
-      <p id="invalid-word"></p>
+  <main>
+    <div id="hint-box">
+      <button id="hintBtn">Get Hint</button>
+      <p id="hintText" class="red-text"></p>
     </div>
 
-    <p id="feedback"></p>
-    <p id="attempts">Attempts Left: <span id="attempt-count"></span></p>
-    <button id="hint-button">Get Hint</button>
-  </section>
+    <div id="guess-box">
+      <input id="attrInput" type="text" placeholder="Enter an attribute" autocomplete="off">
+      <button id="attrBtn">Guess</button>
+      <p id="invalidMsg" class="red-text"></p>
+    </div>
 
-  <aside id="mascot-area">
-    <div class="mascot" id="mascot">🐶</div>
-    <button id="chipBtn">Press Me — Chip</button>
+    <div id="history" class="history"></div>
+
+    <div id="finalArea">
+      <input id="finalInput" type="text" placeholder="Guess the hidden word">
+      <button id="finalBtn">Submit Guess</button>
+    </div>
+
+    <div id="feedback"></div>
+  </main>
+
+  <aside>
+    <div class="mascot">
+      <div id="chip-container">
+        🐶
+        <div id="chip-text" class="speech-bubble">I like socks</div>
+      </div>
+      <button id="chipBtn">Press Me — Chip</button>
+    </div>
+    <div id="adminDropdown" class="adminDropdown"></div>
   </aside>
 
   <footer>
-    <p>Produced by the greatest game player of all time 🏆</p>
+    <div class="producer">Produced by the greatest game player of all time 🏆</div>
   </footer>
-</div>
-
-<div id="admin-panel" class="hidden">
-  <div class="panel-content">
-    <h3>Admin Control</h3>
-    <select id="theme-selector"></select>
-    <button id="set-theme">Set Theme</button>
-  </div>
 </div>
 
 <script src="script.js"></script>
