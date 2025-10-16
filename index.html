@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Under the Theme — Optimized</title>
+<title>Under the Theme — Fast Version</title>
 <style>
 :root {
   --bg: #eaf0ea;
@@ -16,119 +16,58 @@
   --radius: 14px;
 }
 body {
-  margin: 0;
-  font-family: 'Nunito', sans-serif;
-  background: var(--bg);
-  color: #1a202c;
-  display: flex;
-  justify-content: center;
-  padding: 24px;
+  margin: 0; font-family: 'Nunito', sans-serif;
+  background: var(--bg); color: #1a202c;
+  display: flex; justify-content: center; padding: 24px;
 }
-.app {
-  max-width: 980px;
-  width: 100%;
-  background: var(--card);
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.app { max-width: 980px; width: 100%; background: var(--card);
+  border-radius: 18px; padding: 20px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 16px;
 }
-header {
-  display: flex; justify-content: space-between; align-items: center;
-}
-h1 {
-  font-family: 'Merriweather', serif;
-  font-size: 26px;
-  margin: 0;
-  color: var(--accent);
-}
-.meta { font-size: 13px; color: var(--muted); }
-#adminKey {
-  font-size: 22px; cursor: pointer; color: var(--accent2); user-select: none;
-}
-.layout {
-  display: flex; gap: 18px; flex-wrap: wrap;
-}
-.left {
-  flex: 1 1 180px;
-  min-width: 140px;
-  background: var(--card);
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: var(--shadow);
-}
-.themeBox {
-  text-align: center;
-  padding: 12px;
-  background: #d8f3dc;
-  border-radius: 8px;
-}
-.themeLabel { font-size: 12px; color: var(--muted); }
-.themeName { font-weight: 700; font-size: 18px; color: var(--accent); }
-.statusRow { display: flex; justify-content: space-between; margin-top: 12px; font-size: 13px; color: var(--muted); }
-.progressBarContainer { margin-top: 14px; height: 8px; background: #c6f6d5; border-radius: 999px; overflow: hidden; }
-.progressBar { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent2), var(--accent)); transition: width 0.5s ease; }
-.center {
-  flex: 2 1 300px;
-  min-width: 250px;
-  background: #f0fdf4;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: var(--shadow);
-}
-.wordHint { font-size: 14px; text-align: center; margin-bottom: 8px; color: var(--muted); }
-.attr-inputs {
-  display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;
-}
-.attr-inputs input[type="text"] {
-  flex: 1 1 45%; min-width: 120px;
-  padding: 10px 12px; border-radius: 8px; border: 1px solid #e6eef8; font-size: 15px;
-}
-.btn {
-  background: var(--accent2); color: white; border: none; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;
-}
-.btn:hover { opacity: 0.85; }
-.btn.secondary { background: var(--accent); opacity: 0.9; }
-.history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
-.history-item { background: #fcfeff; border-radius: 10px; padding: 10px; display: flex; gap: 12px; align-items: center; }
-.guessText { font-weight: 700; width: 110px; text-transform: lowercase; color: #1a202c; }
-.scoreCell { flex: 1; display: flex; align-items: center; gap: 12px; }
-.scoreBar { height: 10px; background: #d8f3dc; border-radius: 999px; overflow: hidden; }
-.scoreFill { height: 100%; background: linear-gradient(90deg,var(--accent2), var(--accent)); width: 0%; transition: width 0.5s; }
-.scoreLabel { width: 42px; font-weight: 700; text-align: right; color: var(--muted); font-size: 13px; }
-.invalidMsg { color: var(--danger); font-size: 13px; margin-left: 6px; opacity: 0; transition: opacity 0.5s; }
-.final-guess { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-.feedback { margin-top: 10px; color: var(--muted); font-size: 14px; min-height: 20px; text-align: center; }
-.right {
-  flex: 1 1 180px;
-  min-width: 140px;
-  background: var(--card);
-  border-radius: 14px;
-  padding: 12px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.panel-title { font-size: 13px; color: var(--muted); }
-.mascot { text-align: center; font-size: 42px; }
-.mascot button { margin-top: 8px; width: 100%; padding: 8px; border-radius: 8px; border: none; background: #38a169; color: white; font-weight: 700; cursor: pointer; }
-.adminDropdown { margin-top: 6px; display: none; flex-direction: column; gap: 6px; }
-.adminDropdown button { padding: 6px 8px; border-radius: 6px; border: none; background: #e0f2f1; color: var(--accent2); cursor: pointer; }
-footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-.producer { font-family: 'Brush Script MT', cursive; font-weight: 700; }
-@media(max-width:860px){.layout{flex-direction:column;}.left,.right{width:100%; max-width:100%;}.attr-inputs input, .attr-inputs button {flex:1 1 100%;}}
+header { display: flex; justify-content: space-between; align-items: center; }
+h1 { font-family: 'Merriweather', serif; font-size: 26px; margin:0; color: var(--accent);}
+.meta { font-size: 13px; color: var(--muted);}
+#adminKey { font-size: 22px; cursor:pointer; color: var(--accent2); user-select:none;}
+.layout { display: flex; gap: 18px; flex-wrap: wrap; }
+.left, .right, .center { padding: 14px; border-radius: 14px; box-shadow: var(--shadow); }
+.left, .right { flex:1 1 180px; min-width:140px; background: var(--card); }
+.center { flex:2 1 300px; min-width:250px; background: #f0fdf4; }
+.themeBox { text-align:center; padding:12px; background:#d8f3dc; border-radius:8px; }
+.themeLabel { font-size:12px; color: var(--muted); }
+.themeName { font-weight:700; font-size:18px; color: var(--accent); }
+.statusRow { display:flex; justify-content:space-between; margin-top:12px; font-size:13px; color: var(--muted);}
+.progressBarContainer { margin-top:14px; height:8px; background:#c6f6d5; border-radius:999px; overflow:hidden;}
+.progressBar { height:100%; width:0%; background: linear-gradient(90deg,var(--accent2), var(--accent)); transition:width 0.5s ease;}
+.wordHint { font-size:14px; text-align:center; margin-bottom:8px; color: var(--muted); }
+.attr-inputs { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; align-items:center;}
+.attr-inputs input[type="text"] { flex:1 1 45%; min-width:120px; padding:10px 12px; border-radius:8px; border:1px solid #e6eef8; font-size:15px;}
+.btn { background: var(--accent2); color:white; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-weight:600;}
+.btn:hover { opacity:0.85; }
+.btn.secondary { background: var(--accent); opacity:0.9;}
+.history { margin-top:10px; display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto;}
+.history-item { background:#fcfeff; border-radius:10px; padding:10px; display:flex; gap:12px; align-items:center;}
+.guessText { font-weight:700; width:110px; text-transform:lowercase; color:#1a202c;}
+.scoreCell { flex:1; display:flex; align-items:center; gap:12px;}
+.scoreBar { height:10px; background:#d8f3dc; border-radius:999px; overflow:hidden;}
+.scoreFill { height:100%; background: linear-gradient(90deg,var(--accent2), var(--accent)); width:0%; transition:width 0.5s;}
+.scoreLabel { width:42px; font-weight:700; text-align:right; color:var(--muted); font-size:13px;}
+.invalidMsg { color: var(--danger); font-size:13px; margin-left:6px; opacity:0; transition:opacity 0.5s; }
+.final-guess { margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;}
+.feedback { margin-top:10px; color: var(--muted); font-size:14px; min-height:20px; text-align:center;}
+.panel-title { font-size:13px; color:var(--muted);}
+.mascot { text-align:center; font-size:42px;}
+.mascot button { margin-top:8px; width:100%; padding:8px; border-radius:8px; border:none; background:#38a169; color:white; font-weight:700; cursor:pointer;}
+.adminDropdown { margin-top:6px; display:none; flex-direction:column; gap:6px;}
+.adminDropdown button { padding:6px 8px; border-radius:6px; border:none; background:#e0f2f1; color: var(--accent2); cursor:pointer;}
+footer { margin-top:12px; color: var(--muted); font-size:13px; display:flex; justify-content:space-between; align-items:center;}
+.producer { font-family:'Brush Script MT', cursive; font-weight:700;}
+@media(max-width:860px){.layout{flex-direction:column;}.left,.right{width:100%; max-width:100%;}.attr-inputs input, .attr-inputs button{flex:1 1 100%;}}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div>
-    <h1>Under the Theme</h1>
-    <div class="meta">5 attribute guesses → 2 final word guesses</div>
-  </div>
+  <div><h1>Under the Theme</h1><div class="meta">5 attribute guesses → 2 final word guesses</div></div>
   <div id="adminKey" title="Admin Key">🔑</div>
 </header>
 <div class="layout">
@@ -137,15 +76,9 @@ footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; 
     <div class="themeLabel">Theme (today)</div>
     <div class="themeName" id="themeName">Loading...</div>
   </div>
-  <div class="statusRow">
-    <div>Attributes left</div><div id="attrsLeft">5</div>
-  </div>
-  <div class="statusRow">
-    <div>Final guesses left</div><div id="finalLeft">2</div>
-  </div>
-  <div class="progressBarContainer">
-    <div id="progressBar" class="progressBar"></div>
-  </div>
+  <div class="statusRow"><div>Attributes left</div><div id="attrsLeft">5</div></div>
+  <div class="statusRow"><div>Final guesses left</div><div id="finalLeft">2</div></div>
+  <div class="progressBarContainer"><div id="progressBar" class="progressBar"></div></div>
 </aside>
 <main class="center">
   <div class="wordHint" id="wordHint">Make your attribute guesses!</div>
@@ -180,7 +113,7 @@ footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; 
 </footer>
 
 <script>
-// ==== CACHED DOM ELEMENTS ====
+// ==== CACHE DOM ====
 const themeName = document.getElementById("themeName");
 const attrsLeftEl = document.getElementById("attrsLeft");
 const finalLeftEl = document.getElementById("finalLeft");
@@ -193,22 +126,20 @@ const finalArea = document.getElementById("finalArea");
 const attrInput = document.getElementById("attrInput");
 const finalInput = document.getElementById("finalInput");
 
-// ==== CONFIG ====
+// ==== GAME CONFIG ====
 const THEMES = [
   {
     name:"Volcano",
     targetWord:"caldera",
     hint:"It's the crater at the top",
-    words:[
-      "lava","magma","ash","eruption","mountain","rock","crater","fumarole","basalt","cinder","vent","cone","ridge","plate","lavaflow","magmachamber","pyroclastic","venting","caldera","igneous","volcanic","tectonic","lavafield","hotspot","geyser","geothermal","lavafall","volcano","andesite","pumice","bomb","lavafountaining","scoria","mafic","felsic","venting","eruptive","lava tube","lava dome","crust","lava plain","lava lake","volcanism","igneous rock","shield","stratovolcano","composite","tuff","ashcloud","lava plateau","lava channel","volcanic ash","magma plume","lava vent","lava ridge","lava deposit","lava flow","lava dome","lava field","pyroclastic flow","lava fountain","lava bomb","cinder cone","volcanic cone","caldera rim","lava tube","lava lake","magma chamber","igneous formation","volcanic vent","lava sheet","magma vent","lava ridge","pyroclastic surge","basalt flow","andesite dome","felsic lava","mafic lava","tuff cone","ash fall","lava dome collapse","volcanic plateau","lava plateau flow","volcanic neck","lava mound","lava plateau","lava fissure","lava cliff","volcanic plug","lava spire","volcanic venting","magma intrusion","lava tongue","lava dome rim","lava delta","pyroclastic deposit","lava ridge flow","volcanic vent","lava plume","lava cliff","magma dyke","lava mesa","lava plateau rim","volcanic conduit","lava tongue flow","pyroclastic surge deposit","volcanic fissure","lava tube rim","lava channel","lava lake rim","lava dome deposit","lava plateau rim","volcanic plug dome","lava mound flow","volcanic spire","lava flow deposit","lava ridge dome","lava tube deposit","lava cliff dome","lava plateau deposit","lava delta rim","pyroclastic cone","volcanic neck dome","lava tongue dome","lava sheet dome","lava fissure dome","magma intrusion dome","lava tongue deposit","lava dome rim deposit","pyroclastic surge dome","volcanic fissure dome","lava tube rim deposit","lava channel dome","lava lake rim deposit","lava dome deposit dome","lava plateau rim deposit","volcanic plug dome deposit","lava mound flow dome","volcanic spire dome","lava flow deposit dome","lava ridge dome deposit","lava tube deposit dome","lava cliff dome deposit","lava plateau deposit dome","lava delta rim deposit","pyroclastic cone dome","volcanic neck dome deposit","lava tongue dome deposit","lava sheet dome deposit","lava fissure dome deposit","magma intrusion dome deposit","lava tongue deposit dome","lava dome rim deposit dome","pyroclastic surge dome deposit","volcanic fissure dome deposit","lava tube rim deposit dome","lava channel dome deposit","lava lake rim deposit dome","lava dome deposit dome deposit","lava plateau rim deposit dome","volcanic plug dome deposit dome","lava mound flow dome deposit","volcanic spire dome deposit","lava flow deposit dome deposit","lava ridge dome deposit dome","lava tube deposit dome deposit","lava cliff dome deposit dome","lava plateau deposit dome deposit"]
+    words:["lava","magma","ash","eruption","mountain","rock","crater","vent","cone","ridge","plate","lavaflow","pyroclastic","igneous","volcanic","tectonic","basalt","scoria","andesite","pumice","bomb","lava tube","lava dome","shield","stratovolcano","composite","tuff","lava plateau","volcanism","fumarole","lava lake","lava vent","lava deposit","lava field","pyroclastic flow","lava fountain","lava bomb","cinder cone","caldera rim"]
   },
   {
     name:"Mountains",
     targetWord:"ridge",
     hint:"Part of the mountain range",
-    words:["peak","valley","summit","slope","ridge","hill","cliff","plateau","escarpment","mountain","range","crag","outcrop","foothill","alpine","elevation","terrain","ridge","mount","mountainpass","peak ridge","ridge line","mountain top","highland","upland","rockface","mountain face","mountain trail","ridge crest","summit ridge","mountain ridge","mountain slope","mountain peak","mountain pass","valley floor","valley side","foothills","mountain range","mountain system","mountain chain","hilltop","hill range","mountain crest","ridge line","ridge top","mountain spur","mountain plateau","mountain cliff","mountain rock","mountain path","alpine slope","mountain forest","mountain meadow","mountain lake","mountain river","mountain stream","mountain valley","mountain ridge line","mountain pass trail","mountain peak summit","mountain crag","mountain outcrop","mountain escarpment","mountain foothill","mountain upland","mountain highland","mountain elevation","mountain peak ridge","mountain trail path","mountain ridge crest","mountain summit ridge","mountain ridge top","mountain cliff face","mountain plateau top","mountain slope ridge","mountain valley floor","mountain valley side","mountain foothill ridge","mountain upland ridge","mountain highland ridge","mountain ridge line crest","mountain ridge line top","mountain ridge trail","mountain ridge peak","mountain ridge spur","mountain ridge cliff","mountain ridge plateau","mountain ridge forest","mountain ridge meadow","mountain ridge lake","mountain ridge stream","mountain ridge river","mountain ridge path","mountain ridge outcrop","mountain ridge crag","mountain ridge peak ridge","mountain ridge trail path","mountain ridge crest line","mountain ridge top peak","mountain ridge spur trail","mountain ridge cliff face","mountain ridge plateau top","mountain ridge forest path","mountain ridge meadow slope","mountain ridge lake edge","mountain ridge stream side","mountain ridge river bank"]
+    words:["peak","valley","summit","slope","ridge","hill","cliff","plateau","mountain","range","crag","outcrop","foothill","alpine","elevation","terrain","mount","mountainpass","upland","highland"]
   }
-  // add more themes here...
 ];
 
 // ==== STATE ====
@@ -217,21 +148,22 @@ let dailyWord = dailyTheme.targetWord;
 let attrsLeft = 5;
 let finalLeft = 2;
 
-// ==== FUNCTIONS ====
+// ==== INIT FUNCTION ====
 function initGame(){
-  attrsLeftEl.textContent = attrsLeft;
-  finalLeftEl.textContent = finalLeft;
-  progressBar.style.width = "0%";
-  historyEl.innerHTML = "";
+  attrsLeftEl.textContent=attrsLeft;
+  finalLeftEl.textContent=finalLeft;
+  progressBar.style.width="0%";
+  historyEl.innerHTML="";
   invalidMsg.style.opacity=0;
-  wordHintEl.textContent = "Make your attribute guesses!";
-  hintTextEl.textContent = "";
+  wordHintEl.textContent="Make your attribute guesses!";
+  hintTextEl.textContent="";
   finalArea.style.display="none";
   themeName.textContent=dailyTheme.name;
   attrInput.value="";
   finalInput.value="";
 }
 
+// ==== ATTRIBUTE GUESS ====
 function guessAttribute(){
   let val=attrInput.value.trim().toLowerCase();
   attrInput.value="";
@@ -244,14 +176,13 @@ function guessAttribute(){
   }
   attrsLeft--;
   attrsLeftEl.textContent=attrsLeft;
-  let score=Math.floor(Math.random()*70)+30; // simulate relative closeness
-  if(val===dailyWord) score=100;
+  let score=(val===dailyWord)?100:Math.floor(Math.random()*70)+30;
   addHistory(val,score);
-  let progress=(5-attrsLeft)/5*100;
-  progressBar.style.width=progress+"%";
+  progressBar.style.width=((5-attrsLeft)/5*100)+"%";
   if(attrsLeft<=0) finalArea.style.display="flex";
 }
 
+// ==== FINAL GUESS ====
 function finalGuess(){
   let val=finalInput.value.trim().toLowerCase();
   finalInput.value="";
@@ -261,38 +192,31 @@ function finalGuess(){
   if(val===dailyWord){
     feedback("✅ Correct! You got the hidden word!");
     return;
-  }else{
-    feedback(`❌ Wrong! ${finalLeft} final guesses left`);
-  }
+  }else feedback(`❌ Wrong! ${finalLeft} final guesses left`);
   if(finalLeft<=0) feedback(`Game Over! The word was "${dailyWord}"`);
 }
 
+// ==== HISTORY UI ====
 function addHistory(word,score){
   let item=document.createElement("div");
   item.className="history-item";
   item.innerHTML=`<div class="guessText">${word}</div>
-  <div class="scoreCell">
-    <div class="scoreBar"><div class="scoreFill" style="width:${score}%;"></div></div>
-    <div class="scoreLabel">${score}</div>
-  </div>`;
+    <div class="scoreCell"><div class="scoreBar"><div class="scoreFill" style="width:${score}%;"></div></div><div class="scoreLabel">${score}</div></div>`;
   historyEl.prepend(item);
 }
 
+// ==== FEEDBACK ====
 function feedback(txt){document.getElementById("feedback").textContent=txt;}
 
 // ==== EVENTS ====
-document.getElementById("hintBtn").addEventListener("click",()=>{
-  hintTextEl.textContent=dailyTheme.hint;
-});
+document.getElementById("hintBtn").addEventListener("click",()=>{hintTextEl.textContent=dailyTheme.hint;});
 document.getElementById("attrBtn").addEventListener("click",guessAttribute);
 document.getElementById("finalBtn").addEventListener("click",finalGuess);
 attrInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") guessAttribute();});
 finalInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") finalGuess();});
 
 // ==== MASCOT ====
-document.getElementById("chipBtn").addEventListener("click",()=>{
-  alert("Hi! I'm Chip 🐶");
-});
+document.getElementById("chipBtn").addEventListener("click",()=>{alert("Hi! I'm Chip 🐶");});
 
 // ==== ADMIN KEY ====
 const adminKey=document.getElementById("adminKey");
@@ -316,3 +240,4 @@ initGame();
 </script>
 </body>
 </html>
+
