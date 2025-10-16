@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Under the Theme — Homey Edition</title>
+<title>Under the Theme — Enhanced Edition</title>
 <style>
 :root{
   --bg:#eaf0ea;
@@ -49,7 +49,6 @@ h1{
 .layout{
   display:flex; gap:18px; flex-wrap:wrap;
 }
-/* Left */
 .left{
   flex:0 0 260px;
   min-width:220px;
@@ -77,7 +76,6 @@ h1{
   overflow:hidden;
 }
 .progressBar{height:100%; width:0%; background:linear-gradient(90deg,var(--accent2),var(--accent));}
-/* Center */
 .center{
   flex:1 1 420px;
   min-width:280px;
@@ -85,10 +83,16 @@ h1{
   border-radius:12px;
   padding:14px;
   box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
 }
-.wordHint{font-size:14px; text-align:center; margin-bottom:8px; color:var(--muted);}
+.animated-bg{
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  z-index:0; pointer-events:none;
+}
+.wordHint{font-size:14px; text-align:center; margin-bottom:8px; color:var(--muted); position:relative; z-index:1;}
 .attr-inputs{
-  display:flex; gap:8px; margin-bottom:10px; align-items:center;
+  display:flex; gap:8px; margin-bottom:10px; align-items:center; position:relative; z-index:1;
 }
 .attr-inputs input[type="text"]{
   flex:1; padding:10px 12px; border-radius:8px; border:1px solid #e6eef8; font-size:15px;
@@ -97,7 +101,7 @@ h1{
   background:var(--accent2); color:white; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; font-weight:600;
 }
 .btn.secondary{background:var(--accent); opacity:0.9;}
-.history{margin-top:10px; display:flex; flex-direction:column; gap:8px;}
+.history{margin-top:10px; display:flex; flex-direction:column; gap:8px; position:relative; z-index:1;}
 .history-item{
   background:#fcfeff;
   border-radius:10px;
@@ -112,9 +116,9 @@ h1{
 .scoreBar{height:10px; background:#d8f3dc; border-radius:999px; overflow:hidden;}
 .scoreFill{height:100%; background:linear-gradient(90deg,var(--accent2), var(--accent)); width:0%;}
 .scoreLabel{width:42px; font-weight:700; text-align:right; color:var(--muted); font-size:13px;}
-.final-guess{margin-top:12px; display:flex; gap:8px;}
-.feedback{margin-top:10px; color:var(--muted); font-size:14px; min-height:20px; text-align:center;}
-/* Right */
+.invalidMsg{color:var(--danger); font-size:13px; margin-left:6px;}
+.final-guess{margin-top:12px; display:flex; gap:8px; position:relative; z-index:1;}
+.feedback{margin-top:10px; color:var(--muted); font-size:14px; min-height:20px; text-align:center; position:relative; z-index:1;}
 .right{
   flex:0 0 200px;
   min-width:180px;
@@ -141,7 +145,7 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
 <header>
   <div>
     <h1>Under the Theme</h1>
-    <div class="meta">Daily strategic guessing — 3 attribute tries → 2 final guesses</div>
+    <div class="meta">Daily strategic guessing — 5 attribute tries → 2 final guesses</div>
   </div>
   <div id="adminKey" title="Admin Key">🔑</div>
 </header>
@@ -152,7 +156,7 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
     <div class="themeName" id="themeName">Loading...</div>
   </div>
   <div class="statusRow">
-    <div>Attributes left</div><div id="attrsLeft">3</div>
+    <div>Attributes left</div><div id="attrsLeft">5</div>
   </div>
   <div class="statusRow">
     <div>Final guesses left</div><div id="finalLeft">2</div>
@@ -162,22 +166,24 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
   </div>
 </aside>
 <main class="center">
-  <div class="wordHint" id="wordHint">Make 3 attribute guesses to see numeric proximity (0–100).</div>
+  <canvas class="animated-bg" id="animatedBg"></canvas>
+  <div class="wordHint" id="wordHint">Make 5 attribute guesses to see numeric proximity (0–100).</div>
   <div class="attr-inputs">
     <input id="attrInput" type="text" placeholder="Enter an attribute" autocomplete="off">
-    <button class="btn" id="attrBtn" onclick="submitAttribute()">Guess</button>
+    <button class="btn" id="attrBtn">Guess</button>
+    <span class="invalidMsg" id="invalidMsg"></span>
   </div>
   <div class="history" id="history"></div>
   <div class="final-guess" id="finalArea" style="display:none">
     <input id="finalInput" type="text" placeholder="Guess the hidden word">
-    <button class="btn secondary" onclick="submitFinal()" id="finalBtn">Submit Guess</button>
+    <button class="btn secondary" id="finalBtn">Submit Guess</button>
   </div>
   <div class="feedback" id="feedback"></div>
 </main>
 <aside class="right">
   <div>
     <div class="panel-title">Hint / Strategy</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:6px">Use attributes smartly — not the obvious single-word match.</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:6px" id="hintText"></div>
   </div>
   <div>
     <div class="panel-title">Mascot</div>
@@ -189,136 +195,117 @@ footer{margin-top:12px; color:var(--muted); font-size:13px; display:flex; justif
 </div>
 <footer>
   <div class="producer">Produced by the greatest game player of all time</div>
-  <div class="meta" id="seedInfo"></div>
+  <div class="meta"></div>
 </footer>
-</div>
 <script>
-/* ------------------- DATA ------------------- */
+// --- THEME DATA ---
 const THEMES = [
-{
-  name:"Mountains & Earth",
-  targetWord:"volcano",
-  attributeMap:{
-    "lava":85,"rock":60,"mountain":70,"crust":50,"plate":65,"ash":80,"ridge":55,"valley":40,
-    "fault":75,"pressure":60,"peak":50,"magma":90,"volcano":100,"caldera":80,"geyser":75,
-    "boulder":55,"summit":60,"slope":50,"soil":45,"erosion":55,"cliff":60,"ravine":45,
-    "fumarole":70,"tectonic":90,"moraine":65,"strata":55,"seismic":70,"melt":60,
-    "igneous":65,"basalt":60,"andesite":60,"lavaflow":80,"ashcloud":75,"volcanic":85
+  {
+    name: "Mountains & Earth",
+    targetWord: "volcano",
+    hint: "Rugged landforms shaped by tectonic activity",
+    attributeMap: {lava:80, rock:60, eruption:90, caldera:100, ash:70, magma:85, slope:50}
+  },
+  {
+    name: "Oceans & Sea Life",
+    targetWord: "coral",
+    hint: "Colorful underwater ecosystem engineers",
+    attributeMap: {reef:90, fish:70, algae:60, polyp:100, tentacle:50, wave:40, shell:55}
+  },
+  {
+    name: "Weather & Atmosphere",
+    targetWord: "tornado",
+    hint: "Twisting destructive wind phenomenon",
+    attributeMap: {storm:80, funnel:90, wind:100, rain:60, lightning:50, cloud:40, vortex:85}
   }
-},
-{
-  name:"Oceans & Sea Life",
-  targetWord:"coral",
-  attributeMap:{
-    "plankton":70,"krill":65,"reef":90,"wave":55,"shell":50,"seaweed":60,"fish":50,
-    "ocean":40,"current":80,"tide":75,"whale":85,"dolphin":75,"shark":70,"jellyfish":60,
-    "algae":55,"squid":50,"kraken":40,"barnacle":60,"kelp":55,"urchin":50
-  }
-},
-{
-  name:"Weather & Atmosphere",
-  targetWord:"tornado",
-  attributeMap:{
-    "storm":80,"wind":75,"rain":60,"cloud":50,"hail":55,"cyclone":85,"humidity":60,
-    "front":70,"lightning":75,"thunder":65,"tornado":100,"funnel":85,"twister":90,"barometer":50
-  }
-},
-{
-  name:"Food & Cooking",
-  targetWord:"caramel",
-  attributeMap:{
-    "sugar":70,"butter":65,"stir":50,"whisk":55,"bake":60,"caramel":100,"sauce":80,
-    "chocolate":75,"vanilla":60,"cream":65,"boil":55,"brown":50,"simmer":50
-  }
-},
-{
-  name:"Science & Space",
-  targetWord:"nebula",
-  attributeMap:{
-    "star":75,"planet":60,"orbit":55,"photon":50,"nebula":100,"quasar":85,"blackhole":80,
-    "gravity":65,"comet":55,"asteroid":50,"cosmos":60,"galaxy":70
-  }
-},
-{
-  name:"Plants & Nature",
-  targetWord:"fern",
-  attributeMap:{
-    "leaf":70,"root":60,"seed":50,"fern":100,"moss":65,"canopy":55,"tree":60,"vine":50,
-    "bark":50,"photosynthesis":60,"bloom":55,"flower":50
-  }
-}
 ];
-
-/* ------------------- DATE / GAME STATE ------------------- */
 let dailyThemeIndex = 0;
 let dailyTheme = THEMES[dailyThemeIndex];
 let dailyWord = dailyTheme.targetWord;
-let attrsLeft = 3;
+let attrsLeft = 5;
 let finalLeft = 2;
 let historyEl = document.getElementById("history");
-let attrInput = document.getElementById("attrInput");
-let finalInput = document.getElementById("finalInput");
-document.getElementById("themeName").textContent = dailyTheme.name;
 
-/* ------------------- FUNCTIONS ------------------- */
-function getScore(word){
-  word = word.toLowerCase();
-  if(dailyTheme.attributeMap[word]!==undefined) return dailyTheme.attributeMap[word];
-  // approximate: simple letter overlap
-  let overlap=0;
-  for(let c of word) if(dailyWord.includes(c)) overlap++;
-  let val=Math.floor(overlap/Math.max(word.length,dailyWord.length)*100);
-  return Math.min(val,99);
+// --- INIT ---
+function initGame(){
+  document.getElementById("themeName").textContent = dailyTheme.name;
+  document.getElementById("attrsLeft").textContent = attrsLeft;
+  document.getElementById("finalLeft").textContent = finalLeft;
+  document.getElementById("feedback").textContent="";
+  document.getElementById("hintText").textContent="";
+  document.getElementById("wordHint").textContent="Make 5 attribute guesses to see numeric proximity (0–100).";
+  historyEl.innerHTML="";
+  document.getElementById("attrInput").disabled=false;
+  document.getElementById("attrBtn").disabled=false;
+  document.getElementById("finalArea").style.display="none";
+  document.getElementById("finalInput").disabled=false;
+  document.getElementById("finalBtn").disabled=false;
+  document.getElementById("progressBar").style.width="0%";
 }
-function submitAttribute(){
-  let val=attrInput.value.trim().toLowerCase();
-  if(!val){return;}
-  let score=getScore(val);
-  historyEl.innerHTML+=`<div class="history-item">
-    <div class="guessText">${val}</div>
-    <div class="scoreCell">
-      <div class="scoreBar"><div class="scoreFill" style="width:${score}%"></div></div>
-      <div class="scoreLabel">${score}</div>
-    </div>
-  </div>`;
-  attrsLeft--;
-  document.getElementById("attrsLeft").textContent=attrsLeft;
-  attrInput.value="";
-  if(attrsLeft<=0){
-    document.getElementById("finalArea").style.display="flex";
-    attrInput.disabled=true;
-    document.getElementById("attrBtn").disabled=true;
-    document.getElementById("feedback").textContent="Make final guesses for the hidden word!";
-  }
-  updateProgress();
-}
-function submitFinal(){
-  let val=finalInput.value.trim().toLowerCase();
-  if(!val){return;}
-  finalLeft--;
-  document.getElementById("finalLeft").textContent=finalLeft;
-  if(val===dailyWord){
-    document.getElementById("feedback").textContent="🎉 Correct! The hidden word was: "+dailyWord;
-    finalInput.disabled=true; document.getElementById("finalBtn").disabled=true;
-  }else if(finalLeft<=0){
-    document.getElementById("feedback").textContent="❌ Out of guesses! The hidden word was: "+dailyWord;
-    finalInput.disabled=true; document.getElementById("finalBtn").disabled=true;
-  }else{
-    document.getElementById("feedback").textContent=`Wrong! You have ${finalLeft} final guesses left.`;
-  }
-  finalInput.value="";
-}
-function updateProgress(){
-  let total=3+2;
-  let done=3-attrsLeft+(2-finalLeft);
-  document.getElementById("progressBar").style.width=Math.floor(done/total*100)+"%";
-}
+initGame();
+
+// --- CHIP MASCOT ---
 function chipRun(){
   let chip=document.getElementById("mascot");
   chip.textContent="Hi, I'm Chip! 🐕‍🦺";
   setTimeout(()=>{chip.textContent="🐶";},1800);
 }
-/* ------------------- ADMIN KEY ------------------- */
+
+// --- ATTRIBUTE GUESS ---
+function guessAttribute(){
+  let val=document.getElementById("attrInput").value.toLowerCase().trim();
+  let invalidMsg=document.getElementById("invalidMsg");
+  invalidMsg.textContent="";
+  if(!dailyTheme.attributeMap[val]){
+    invalidMsg.textContent="❌ Not a listed word, try again";
+    document.getElementById("attrInput").value="";
+    return; // Do not decrement guess
+  }
+  let score = dailyTheme.attributeMap[val];
+  attrsLeft--;
+  document.getElementById("attrsLeft").textContent=attrsLeft;
+  addHistoryItem(val, score);
+  updateProgress();
+  if(attrsLeft <=2){document.getElementById("hintText").textContent=dailyTheme.hint;}
+  if(attrsLeft<=0){document.getElementById("finalArea").style.display="flex";}
+  document.getElementById("attrInput").value="";
+}
+
+// --- HISTORY ---
+function addHistoryItem(word, score){
+  let div=document.createElement("div"); div.className="history-item";
+  div.innerHTML=`<div class="guessText">${word}</div>
+    <div class="scoreCell"><div class="scoreBar"><div class="scoreFill" style="width:${score}%;"></div></div>
+    <div class="scoreLabel">${score}</div></div>`;
+  historyEl.prepend(div);
+}
+
+// --- FINAL GUESS ---
+function finalGuess(){
+  let val=document.getElementById("finalInput").value.toLowerCase().trim();
+  finalLeft--;
+  document.getElementById("finalLeft").textContent=finalLeft;
+  if(val===dailyWord){
+    document.getElementById("feedback").textContent="🎉 Correct! The hidden word was: "+dailyWord;
+    document.getElementById("finalInput").disabled=true; document.getElementById("finalBtn").disabled=true;
+  }else if(finalLeft<=0){
+    document.getElementById("feedback").textContent="❌ Out of guesses! The hidden word was: "+dailyWord;
+    document.getElementById("finalInput").disabled=true; document.getElementById("finalBtn").disabled=true;
+  }else{
+    document.getElementById("feedback").textContent=`Wrong! You have ${finalLeft} final guesses left.`;
+  }
+  document.getElementById("finalInput").value="";
+  updateProgress();
+}
+
+// --- PROGRESS BAR ---
+function updateProgress(){
+  let total=5+2;
+  let done=5-attrsLeft+(2-finalLeft);
+  document.getElementById("progressBar").style.width=Math.floor(done/total*100)+"%";
+}
+
+// --- ADMIN KEY ---
 document.getElementById("adminKey").addEventListener("click",()=>{
   let pin=prompt("Enter Admin PIN:");
   if(pin==="1234"){
@@ -327,34 +314,60 @@ document.getElementById("adminKey").addEventListener("click",()=>{
     THEMES.forEach((theme,index)=>{
       let btn=document.createElement("button");
       btn.textContent=theme.name;
-      btn.onclick=()=>{loadTheme(index); dropdown.style.display="none";};
+      btn.onclick=()=>{loadTheme(index); dropdown.style.display="none";}
       dropdown.appendChild(btn);
     });
     dropdown.style.display="flex";
-  }else{
-    alert("Incorrect PIN");
-  }
+  }else{alert("Incorrect PIN");}
 });
 function loadTheme(index){
   dailyThemeIndex=index;
   dailyTheme=THEMES[index];
   dailyWord=dailyTheme.targetWord;
-  attrsLeft=3; finalLeft=2;
-  document.getElementById("themeName").textContent=dailyTheme.name;
-  historyEl.innerHTML="";
-  document.getElementById("attrInput").disabled=false;
-  document.getElementById("attrBtn").disabled=false;
-  document.getElementById("finalArea").style.display="none";
-  document.getElementById("finalInput").disabled=false;
-  document.getElementById("finalBtn").disabled=false;
-  document.getElementById("attrsLeft").textContent=attrsLeft;
-  document.getElementById("finalLeft").textContent=finalLeft;
-  document.getElementById("feedback").textContent="";
-  document.getElementById("progressBar").style.width="0%";
-  document.getElementById("wordHint").textContent="Make 3 attribute guesses to see numeric proximity (0–100).";
+  attrsLeft=5; finalLeft=2;
+  localStorage.setItem("themeIndex",index);
+  initGame();
 }
+
+// --- LOAD LAST THEME FROM STORAGE ---
+if(localStorage.getItem("themeIndex")){
+  loadTheme(parseInt(localStorage.getItem("themeIndex")));
+}
+
+// --- ENTER KEY SUBMISSION ---
+document.getElementById("attrInput").addEventListener("keypress",(e)=>{
+  if(e.key==="Enter"){guessAttribute();}
+});
+document.getElementById("finalInput").addEventListener("keypress",(e)=>{
+  if(e.key==="Enter"){finalGuess();}
+});
+document.getElementById("attrBtn").addEventListener("click",guessAttribute);
+document.getElementById("finalBtn").addEventListener("click",finalGuess);
+
+// --- ANIMATED BACKGROUND ---
+const canvas = document.getElementById("animatedBg");
+const ctx = canvas.getContext("2d");
+canvas.width=canvas.offsetWidth;
+canvas.height=canvas.offsetHeight;
+function drawBg(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // Simple animated mountains example
+  let time = Date.now()*0.002;
+  for(let i=0;i<3;i++){
+    let h = canvas.height/2 + 20*i + Math.sin(time+i)*10;
+    ctx.fillStyle = `rgba(${50+50*i}, ${100+30*i}, 80, 0.4)`;
+    ctx.beginPath();
+    ctx.moveTo(0,canvas.height);
+    ctx.lineTo(canvas.width/2, canvas.height-h);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.fill();
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
 </script>
 </body>
 </html>
+
 
 
