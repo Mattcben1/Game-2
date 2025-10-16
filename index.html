@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Under the Theme — Clean Word Bank Edition</title>
+<title>Under the Theme — Optimized</title>
 <style>
 :root {
   --bg: #eaf0ea;
@@ -52,8 +52,8 @@ h1 {
   display: flex; gap: 18px; flex-wrap: wrap;
 }
 .left {
-  flex: 0 0 260px;
-  min-width: 220px;
+  flex: 1 1 180px;
+  min-width: 140px;
   background: var(--card);
   border-radius: 14px;
   padding: 14px;
@@ -71,8 +71,8 @@ h1 {
 .progressBarContainer { margin-top: 14px; height: 8px; background: #c6f6d5; border-radius: 999px; overflow: hidden; }
 .progressBar { height: 100%; width: 0%; background: linear-gradient(90deg,var(--accent2), var(--accent)); transition: width 0.5s ease; }
 .center {
-  flex: 1 1 420px;
-  min-width: 280px;
+  flex: 2 1 300px;
+  min-width: 250px;
   background: #f0fdf4;
   border-radius: 14px;
   padding: 16px;
@@ -80,17 +80,18 @@ h1 {
 }
 .wordHint { font-size: 14px; text-align: center; margin-bottom: 8px; color: var(--muted); }
 .attr-inputs {
-  display: flex; gap: 8px; margin-bottom: 10px; align-items: center;
+  display: flex; gap: 8px; margin-bottom: 10px; align-items: center; flex-wrap: wrap;
 }
 .attr-inputs input[type="text"] {
-  flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid #e6eef8; font-size: 15px;
+  flex: 1 1 45%; min-width: 120px;
+  padding: 10px 12px; border-radius: 8px; border: 1px solid #e6eef8; font-size: 15px;
 }
 .btn {
   background: var(--accent2); color: white; border: none; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-weight: 600;
 }
 .btn:hover { opacity: 0.85; }
 .btn.secondary { background: var(--accent); opacity: 0.9; }
-.history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.history { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
 .history-item { background: #fcfeff; border-radius: 10px; padding: 10px; display: flex; gap: 12px; align-items: center; }
 .guessText { font-weight: 700; width: 110px; text-transform: lowercase; color: #1a202c; }
 .scoreCell { flex: 1; display: flex; align-items: center; gap: 12px; }
@@ -98,11 +99,11 @@ h1 {
 .scoreFill { height: 100%; background: linear-gradient(90deg,var(--accent2), var(--accent)); width: 0%; transition: width 0.5s; }
 .scoreLabel { width: 42px; font-weight: 700; text-align: right; color: var(--muted); font-size: 13px; }
 .invalidMsg { color: var(--danger); font-size: 13px; margin-left: 6px; opacity: 0; transition: opacity 0.5s; }
-.final-guess { margin-top: 12px; display: flex; gap: 8px; }
+.final-guess { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
 .feedback { margin-top: 10px; color: var(--muted); font-size: 14px; min-height: 20px; text-align: center; }
 .right {
-  flex: 0 0 200px;
-  min-width: 180px;
+  flex: 1 1 180px;
+  min-width: 140px;
   background: var(--card);
   border-radius: 14px;
   padding: 12px;
@@ -118,7 +119,7 @@ h1 {
 .adminDropdown button { padding: 6px 8px; border-radius: 6px; border: none; background: #e0f2f1; color: var(--accent2); cursor: pointer; }
 footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
 .producer { font-family: 'Brush Script MT', cursive; font-weight: 700; }
-@media(max-width:860px){.layout{flex-direction:column;}.left,.right{width:100%; max-width:100%;}}
+@media(max-width:860px){.layout{flex-direction:column;}.left,.right{width:100%; max-width:100%;}.attr-inputs input, .attr-inputs button {flex:1 1 100%;}}
 </style>
 </head>
 <body>
@@ -179,182 +180,139 @@ footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; 
 </footer>
 
 <script>
-// ===== CLEAN THEME DATA =====
+// ==== CACHED DOM ELEMENTS ====
+const themeName = document.getElementById("themeName");
+const attrsLeftEl = document.getElementById("attrsLeft");
+const finalLeftEl = document.getElementById("finalLeft");
+const progressBar = document.getElementById("progressBar");
+const historyEl = document.getElementById("history");
+const invalidMsg = document.getElementById("invalidMsg");
+const wordHintEl = document.getElementById("wordHint");
+const hintTextEl = document.getElementById("hintText");
+const finalArea = document.getElementById("finalArea");
+const attrInput = document.getElementById("attrInput");
+const finalInput = document.getElementById("finalInput");
+
+// ==== CONFIG ====
 const THEMES = [
   {
-    name:"Mountains & Earth",
-    targetWord:"volcano",
-    hint:"Rugged landforms shaped by tectonic activity",
-    attributeMap: generateWords(["lava","rock","eruption","magma","hill","slope","ash","crater","mountain","ridge","plateau"],200),
-    wordBank: generateWordBank([
-      "lava","rock","eruption","magma","hill","slope","ash","crater","mountain","ridge","plateau","summit","peak","range","canyon","valley","cliff","boulder",
-      "igneous","sedimentary","tectonic","fault","volcanic","lavaflow","hotspot","plate","geology","alpine","glacier","basalt","quartz","granite","ridgepole",
-      "sediment","outcrop","foothill","escarpment","volcanism","caldera","volcanology","mount","lavafield","cinder","dome","cone","pyroclastic","lavaflow",
-      "fumarole","magmachamber","lavavent","plateboundary","mountainpass","gneiss","strata","lavaflow","fold","rift","sill","dike","felsic","mafic","andesite",
-      "lavaflow","butte","mesa","volcaniclastic","lavaflow","mudflow","lahar","lavaflow","tuff","pumice","obsidian","lavaflow","scoria","lavaflow","lavaflow"
-    ],200)
+    name:"Volcano",
+    targetWord:"caldera",
+    hint:"It's the crater at the top",
+    words:[
+      "lava","magma","ash","eruption","mountain","rock","crater","fumarole","basalt","cinder","vent","cone","ridge","plate","lavaflow","magmachamber","pyroclastic","venting","caldera","igneous","volcanic","tectonic","lavafield","hotspot","geyser","geothermal","lavafall","volcano","andesite","pumice","bomb","lavafountaining","scoria","mafic","felsic","venting","eruptive","lava tube","lava dome","crust","lava plain","lava lake","volcanism","igneous rock","shield","stratovolcano","composite","tuff","ashcloud","lava plateau","lava channel","volcanic ash","magma plume","lava vent","lava ridge","lava deposit","lava flow","lava dome","lava field","pyroclastic flow","lava fountain","lava bomb","cinder cone","volcanic cone","caldera rim","lava tube","lava lake","magma chamber","igneous formation","volcanic vent","lava sheet","magma vent","lava ridge","pyroclastic surge","basalt flow","andesite dome","felsic lava","mafic lava","tuff cone","ash fall","lava dome collapse","volcanic plateau","lava plateau flow","volcanic neck","lava mound","lava plateau","lava fissure","lava cliff","volcanic plug","lava spire","volcanic venting","magma intrusion","lava tongue","lava dome rim","lava delta","pyroclastic deposit","lava ridge flow","volcanic vent","lava plume","lava cliff","magma dyke","lava mesa","lava plateau rim","volcanic conduit","lava tongue flow","pyroclastic surge deposit","volcanic fissure","lava tube rim","lava channel","lava lake rim","lava dome deposit","lava plateau rim","volcanic plug dome","lava mound flow","volcanic spire","lava flow deposit","lava ridge dome","lava tube deposit","lava cliff dome","lava plateau deposit","lava delta rim","pyroclastic cone","volcanic neck dome","lava tongue dome","lava sheet dome","lava fissure dome","magma intrusion dome","lava tongue deposit","lava dome rim deposit","pyroclastic surge dome","volcanic fissure dome","lava tube rim deposit","lava channel dome","lava lake rim deposit","lava dome deposit dome","lava plateau rim deposit","volcanic plug dome deposit","lava mound flow dome","volcanic spire dome","lava flow deposit dome","lava ridge dome deposit","lava tube deposit dome","lava cliff dome deposit","lava plateau deposit dome","lava delta rim deposit","pyroclastic cone dome","volcanic neck dome deposit","lava tongue dome deposit","lava sheet dome deposit","lava fissure dome deposit","magma intrusion dome deposit","lava tongue deposit dome","lava dome rim deposit dome","pyroclastic surge dome deposit","volcanic fissure dome deposit","lava tube rim deposit dome","lava channel dome deposit","lava lake rim deposit dome","lava dome deposit dome deposit","lava plateau rim deposit dome","volcanic plug dome deposit dome","lava mound flow dome deposit","volcanic spire dome deposit","lava flow deposit dome deposit","lava ridge dome deposit dome","lava tube deposit dome deposit","lava cliff dome deposit dome","lava plateau deposit dome deposit"]
   },
   {
-    name:"Oceans & Sea Life",
-    targetWord:"coral",
-    hint:"Colorful underwater ecosystem engineers",
-    attributeMap: generateWords(["reef","fish","algae","polyp","wave","shell","plankton","sea","tide","current"],200),
-    wordBank: generateWordBank([
-      "reef","fish","algae","polyp","wave","shell","plankton","sea","tide","current","jellyfish","shrimp","starfish","urchin","mollusk","clownfish",
-      "turtle","dolphin","krill","octopus","seahorse","anemone","seaweed","eel","shark","whale","seal","penguin","lobster","crab","squid","sponge",
-      "coral","kelp","manta","stingray","urchin","clam","oyster","scallop","barnacle","nautilus","manatee","anglerfish","blowfish","seafoam","seabed",
-      "planktonic","phytoplankton","zooplankton","fishschool","currents","tidepool","seafloor","estuary","lagoon","brine","shellfish","seamount","coastline",
-      "saltwater","saltmarsh","estuaries"
-    ],200)
-  },
-  {
-    name:"Weather & Atmosphere",
-    targetWord:"tornado",
-    hint:"Twisting destructive wind phenomenon",
-    attributeMap: generateWords(["storm","funnel","wind","rain","lightning","cloud","vortex","gust","hurricane","cyclone"],200),
-    wordBank: generateWordBank([
-      "storm","funnel","wind","rain","lightning","cloud","vortex","gust","hurricane","cyclone","thunder","snow","hail","blizzard","tornado",
-      "whirlwind","gale","rainstorm","drizzle","thunderstorm","tempest","squall","downpour","overcast","sky","barometer","humidity","thermometer",
-      "atmosphere","pressure","dew","windchill","jetstream","cumulus","stratus","cirrus","nimbus","fog","mist","hailstone","torrential","monsoon",
-      "cyclone","front","isobar","highpressure","lowpressure"
-    ],200)
+    name:"Mountains",
+    targetWord:"ridge",
+    hint:"Part of the mountain range",
+    words:["peak","valley","summit","slope","ridge","hill","cliff","plateau","escarpment","mountain","range","crag","outcrop","foothill","alpine","elevation","terrain","ridge","mount","mountainpass","peak ridge","ridge line","mountain top","highland","upland","rockface","mountain face","mountain trail","ridge crest","summit ridge","mountain ridge","mountain slope","mountain peak","mountain pass","valley floor","valley side","foothills","mountain range","mountain system","mountain chain","hilltop","hill range","mountain crest","ridge line","ridge top","mountain spur","mountain plateau","mountain cliff","mountain rock","mountain path","alpine slope","mountain forest","mountain meadow","mountain lake","mountain river","mountain stream","mountain valley","mountain ridge line","mountain pass trail","mountain peak summit","mountain crag","mountain outcrop","mountain escarpment","mountain foothill","mountain upland","mountain highland","mountain elevation","mountain peak ridge","mountain trail path","mountain ridge crest","mountain summit ridge","mountain ridge top","mountain cliff face","mountain plateau top","mountain slope ridge","mountain valley floor","mountain valley side","mountain foothill ridge","mountain upland ridge","mountain highland ridge","mountain ridge line crest","mountain ridge line top","mountain ridge trail","mountain ridge peak","mountain ridge spur","mountain ridge cliff","mountain ridge plateau","mountain ridge forest","mountain ridge meadow","mountain ridge lake","mountain ridge stream","mountain ridge river","mountain ridge path","mountain ridge outcrop","mountain ridge crag","mountain ridge peak ridge","mountain ridge trail path","mountain ridge crest line","mountain ridge top peak","mountain ridge spur trail","mountain ridge cliff face","mountain ridge plateau top","mountain ridge forest path","mountain ridge meadow slope","mountain ridge lake edge","mountain ridge stream side","mountain ridge river bank"]
   }
+  // add more themes here...
 ];
 
-let dailyThemeIndex = 0;
-let dailyTheme = THEMES[dailyThemeIndex];
+// ==== STATE ====
+let dailyTheme = THEMES[0];
 let dailyWord = dailyTheme.targetWord;
 let attrsLeft = 5;
 let finalLeft = 2;
-let historyEl = document.getElementById("history");
 
-// ===== FUNCTIONS =====
-function generateWords(baseWords,count){
-  let obj={};
-  while(Object.keys(obj).length<count){
-    baseWords.forEach(w=>{
-      if(Object.keys(obj).length<count)obj[w] = Math.floor(Math.random()*100);
-    });
-  }
-  return obj;
-}
-
-function generateWordBank(baseWords,count){
-  let arr=[];
-  let i=0;
-  while(arr.length<count){
-    arr.push(baseWords[i % baseWords.length]);
-    i++;
-  }
-  return arr;
-}
-
+// ==== FUNCTIONS ====
 function initGame(){
-  document.getElementById("themeName").textContent=dailyTheme.name;
-  document.getElementById("attrsLeft").textContent=attrsLeft;
-  document.getElementById("finalLeft").textContent=finalLeft;
-  document.getElementById("feedback").textContent="";
-  document.getElementById("hintText").textContent="";
-  document.getElementById("wordHint").textContent="Make your attribute guesses!";
-  historyEl.innerHTML="";
-  document.getElementById("attrInput").disabled=false;
-  document.getElementById("attrBtn").disabled=false;
-  document.getElementById("finalArea").style.display="none";
-  document.getElementById("finalInput").disabled=false;
-  document.getElementById("finalBtn").disabled=false;
-  document.getElementById("progressBar").style.width="0%";
+  attrsLeftEl.textContent = attrsLeft;
+  finalLeftEl.textContent = finalLeft;
+  progressBar.style.width = "0%";
+  historyEl.innerHTML = "";
+  invalidMsg.style.opacity=0;
+  wordHintEl.textContent = "Make your attribute guesses!";
+  hintTextEl.textContent = "";
+  finalArea.style.display="none";
+  themeName.textContent=dailyTheme.name;
+  attrInput.value="";
+  finalInput.value="";
 }
-initGame();
 
-// ===== CHIP MASCOT =====
-function chipRun(){
-  let chip=document.getElementById("mascot");
-  chip.textContent="Hi, I'm Chip! 🐕‍🦺";
-  setTimeout(()=>{chip.textContent="🐶";},2000);
-}
-document.getElementById("chipBtn").addEventListener("click",chipRun);
-
-// ===== ATTRIBUTE GUESS =====
 function guessAttribute(){
-  let val=document.getElementById("attrInput").value.toLowerCase().trim();
-  let invalidMsg=document.getElementById("invalidMsg");
-  if(!dailyTheme.wordBank.includes(val)){
-    invalidMsg.textContent="❌ Not a listed word, try again";
-    invalidMsg.style.opacity="1";
-    document.getElementById("attrInput").value="";
-    setTimeout(()=>{invalidMsg.style.opacity="0";},2000);
+  let val=attrInput.value.trim().toLowerCase();
+  attrInput.value="";
+  if(!val) return;
+  if(!dailyTheme.words.includes(val)){
+    invalidMsg.textContent="Not a listed word, try again";
+    invalidMsg.style.opacity=1;
+    setTimeout(()=>{invalidMsg.style.opacity=0},1600);
     return;
   }
-  let score = dailyTheme.attributeMap[val] || 0;
   attrsLeft--;
-  document.getElementById("attrsLeft").textContent=attrsLeft;
-  addHistoryItem(val,score);
-  updateProgress();
-  if(attrsLeft<=2){document.getElementById("hintText").textContent=dailyTheme.hint;}
-  if(attrsLeft<=0){document.getElementById("finalArea").style.display="flex";}
-  document.getElementById("attrInput").value="";
+  attrsLeftEl.textContent=attrsLeft;
+  let score=Math.floor(Math.random()*70)+30; // simulate relative closeness
+  if(val===dailyWord) score=100;
+  addHistory(val,score);
+  let progress=(5-attrsLeft)/5*100;
+  progressBar.style.width=progress+"%";
+  if(attrsLeft<=0) finalArea.style.display="flex";
 }
 
-// ===== HISTORY =====
-function addHistoryItem(word,score){
-  let div=document.createElement("div"); div.className="history-item";
-  div.innerHTML=`<div class="guessText">${word}</div>
-    <div class="scoreCell"><div class="scoreBar"><div class="scoreFill" style="width:${score}%;"></div></div>
-    <div class="scoreLabel">${score}</div></div>`;
-  historyEl.prepend(div);
-}
-
-// ===== FINAL GUESS =====
 function finalGuess(){
-  let val=document.getElementById("finalInput").value.toLowerCase().trim();
+  let val=finalInput.value.trim().toLowerCase();
+  finalInput.value="";
+  if(!val) return;
   finalLeft--;
-  document.getElementById("finalLeft").textContent=finalLeft;
+  finalLeftEl.textContent=finalLeft;
   if(val===dailyWord){
-    document.getElementById("feedback").textContent="🎉 Correct! The hidden word was: "+dailyWord;
-    document.getElementById("finalInput").disabled=true; document.getElementById("finalBtn").disabled=true;
-  }else if(finalLeft<=0){
-    document.getElementById("feedback").textContent="❌ Out of guesses! The hidden word was: "+dailyWord;
-    document.getElementById("finalInput").disabled=true; document.getElementById("finalBtn").disabled=true;
+    feedback("✅ Correct! You got the hidden word!");
+    return;
   }else{
-    document.getElementById("feedback").textContent=`Wrong! You have ${finalLeft} final guesses left.`;
+    feedback(`❌ Wrong! ${finalLeft} final guesses left`);
   }
-  document.getElementById("finalInput").value="";
-  updateProgress();
+  if(finalLeft<=0) feedback(`Game Over! The word was "${dailyWord}"`);
 }
 
-// ===== PROGRESS BAR =====
-function updateProgress(){
-  let total=5+2;
-  let done=5-attrsLeft+(2-finalLeft);
-  document.getElementById("progressBar").style.width=Math.floor(done/total*100)+"%";
+function addHistory(word,score){
+  let item=document.createElement("div");
+  item.className="history-item";
+  item.innerHTML=`<div class="guessText">${word}</div>
+  <div class="scoreCell">
+    <div class="scoreBar"><div class="scoreFill" style="width:${score}%;"></div></div>
+    <div class="scoreLabel">${score}</div>
+  </div>`;
+  historyEl.prepend(item);
 }
 
-// ===== ADMIN KEY =====
-document.getElementById("adminKey").addEventListener("click",()=>{
-  let pin=prompt("Enter Admin PIN:");
-  if(pin==="1234"){
-    let dropdown=document.getElementById("adminDropdown");
-    dropdown.innerHTML="";
-    THEMES.forEach((theme,index)=>{
-      let btn=document.createElement("button");
-      btn.textContent=theme.name;
-      btn.onclick=()=>{dailyThemeIndex=index; dailyTheme=THEMES[index]; dailyWord=dailyTheme.targetWord; attrsLeft=5; finalLeft=2; initGame();}
-      dropdown.appendChild(btn);
-    });
-    dropdown.style.display="flex";
-  }
-});
+function feedback(txt){document.getElementById("feedback").textContent=txt;}
 
-// ===== HINT BUTTON =====
+// ==== EVENTS ====
 document.getElementById("hintBtn").addEventListener("click",()=>{
-  document.getElementById("hintText").textContent=dailyTheme.hint;
+  hintTextEl.textContent=dailyTheme.hint;
 });
-
-// ===== BUTTON EVENTS =====
 document.getElementById("attrBtn").addEventListener("click",guessAttribute);
 document.getElementById("finalBtn").addEventListener("click",finalGuess);
-document.getElementById("attrInput").addEventListener("keypress",(e)=>{if(e.key==="Enter") guessAttribute();});
-document.getElementById("finalInput").addEventListener("keypress",(e)=>{if(e.key==="Enter") finalGuess();});
+attrInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") guessAttribute();});
+finalInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") finalGuess();});
+
+// ==== MASCOT ====
+document.getElementById("chipBtn").addEventListener("click",()=>{
+  alert("Hi! I'm Chip 🐶");
+});
+
+// ==== ADMIN KEY ====
+const adminKey=document.getElementById("adminKey");
+const adminDropdown=document.getElementById("adminDropdown");
+adminKey.addEventListener("click",()=>{
+  let pin=prompt("Enter admin PIN:");
+  if(pin==="1234"){
+    adminDropdown.innerHTML="";
+    THEMES.forEach((t,i)=>{
+      let btn=document.createElement("button");
+      btn.textContent=t.name;
+      btn.onclick=()=>{dailyTheme=THEMES[i]; dailyWord=dailyTheme.targetWord; attrsLeft=5; finalLeft=2; initGame(); adminDropdown.style.display="none";}
+      adminDropdown.appendChild(btn);
+    });
+    adminDropdown.style.display="flex";
+  }else alert("Wrong PIN");
+});
+
+// ==== INIT ====
+initGame();
 </script>
 </body>
 </html>
