@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Under the Theme — Functional Edition</title>
+<title>Under the Theme — Clean Word Bank Edition</title>
 <style>
 :root {
   --bg: #eaf0ea;
@@ -179,27 +179,48 @@ footer { margin-top: 12px; color: var(--muted); font-size: 13px; display: flex; 
 </footer>
 
 <script>
-// ===== THEME DATA =====
+// ===== CLEAN THEME DATA =====
 const THEMES = [
   {
     name:"Mountains & Earth",
     targetWord:"volcano",
     hint:"Rugged landforms shaped by tectonic activity",
-    attributeMap: generateWords(["lava","rock","eruption","magma","hill","slope","ash","crater","mountain","ridge","plateau"],200)
+    attributeMap: generateWords(["lava","rock","eruption","magma","hill","slope","ash","crater","mountain","ridge","plateau"],200),
+    wordBank: generateWordBank([
+      "lava","rock","eruption","magma","hill","slope","ash","crater","mountain","ridge","plateau","summit","peak","range","canyon","valley","cliff","boulder",
+      "igneous","sedimentary","tectonic","fault","volcanic","lavaflow","hotspot","plate","geology","alpine","glacier","basalt","quartz","granite","ridgepole",
+      "sediment","outcrop","foothill","escarpment","volcanism","caldera","volcanology","mount","lavafield","cinder","dome","cone","pyroclastic","lavaflow",
+      "fumarole","magmachamber","lavavent","plateboundary","mountainpass","gneiss","strata","lavaflow","fold","rift","sill","dike","felsic","mafic","andesite",
+      "lavaflow","butte","mesa","volcaniclastic","lavaflow","mudflow","lahar","lavaflow","tuff","pumice","obsidian","lavaflow","scoria","lavaflow","lavaflow"
+    ],200)
   },
   {
     name:"Oceans & Sea Life",
     targetWord:"coral",
     hint:"Colorful underwater ecosystem engineers",
-    attributeMap: generateWords(["reef","fish","algae","polyp","wave","shell","plankton","sea","tide","current"],200)
+    attributeMap: generateWords(["reef","fish","algae","polyp","wave","shell","plankton","sea","tide","current"],200),
+    wordBank: generateWordBank([
+      "reef","fish","algae","polyp","wave","shell","plankton","sea","tide","current","jellyfish","shrimp","starfish","urchin","mollusk","clownfish",
+      "turtle","dolphin","krill","octopus","seahorse","anemone","seaweed","eel","shark","whale","seal","penguin","lobster","crab","squid","sponge",
+      "coral","kelp","manta","stingray","urchin","clam","oyster","scallop","barnacle","nautilus","manatee","anglerfish","blowfish","seafoam","seabed",
+      "planktonic","phytoplankton","zooplankton","fishschool","currents","tidepool","seafloor","estuary","lagoon","brine","shellfish","seamount","coastline",
+      "saltwater","saltmarsh","estuaries"
+    ],200)
   },
   {
     name:"Weather & Atmosphere",
     targetWord:"tornado",
     hint:"Twisting destructive wind phenomenon",
-    attributeMap: generateWords(["storm","funnel","wind","rain","lightning","cloud","vortex","gust","hurricane","cyclone"],200)
+    attributeMap: generateWords(["storm","funnel","wind","rain","lightning","cloud","vortex","gust","hurricane","cyclone"],200),
+    wordBank: generateWordBank([
+      "storm","funnel","wind","rain","lightning","cloud","vortex","gust","hurricane","cyclone","thunder","snow","hail","blizzard","tornado",
+      "whirlwind","gale","rainstorm","drizzle","thunderstorm","tempest","squall","downpour","overcast","sky","barometer","humidity","thermometer",
+      "atmosphere","pressure","dew","windchill","jetstream","cumulus","stratus","cirrus","nimbus","fog","mist","hailstone","torrential","monsoon",
+      "cyclone","front","isobar","highpressure","lowpressure"
+    ],200)
   }
 ];
+
 let dailyThemeIndex = 0;
 let dailyTheme = THEMES[dailyThemeIndex];
 let dailyWord = dailyTheme.targetWord;
@@ -207,18 +228,27 @@ let attrsLeft = 5;
 let finalLeft = 2;
 let historyEl = document.getElementById("history");
 
-// ===== HELPER: Generate large dictionary with random weights =====
+// ===== FUNCTIONS =====
 function generateWords(baseWords,count){
   let obj={};
   while(Object.keys(obj).length<count){
     baseWords.forEach(w=>{
-      if(Object.keys(obj).length<count)obj[w+(Math.random()*1000|0)] = Math.floor(Math.random()*100);
+      if(Object.keys(obj).length<count)obj[w] = Math.floor(Math.random()*100);
     });
   }
   return obj;
 }
 
-// ===== INIT GAME =====
+function generateWordBank(baseWords,count){
+  let arr=[];
+  let i=0;
+  while(arr.length<count){
+    arr.push(baseWords[i % baseWords.length]);
+    i++;
+  }
+  return arr;
+}
+
 function initGame(){
   document.getElementById("themeName").textContent=dailyTheme.name;
   document.getElementById("attrsLeft").textContent=attrsLeft;
@@ -248,14 +278,14 @@ document.getElementById("chipBtn").addEventListener("click",chipRun);
 function guessAttribute(){
   let val=document.getElementById("attrInput").value.toLowerCase().trim();
   let invalidMsg=document.getElementById("invalidMsg");
-  if(!dailyTheme.attributeMap[val]){
+  if(!dailyTheme.wordBank.includes(val)){
     invalidMsg.textContent="❌ Not a listed word, try again";
     invalidMsg.style.opacity="1";
     document.getElementById("attrInput").value="";
     setTimeout(()=>{invalidMsg.style.opacity="0";},2000);
     return;
   }
-  let score=dailyTheme.attributeMap[val];
+  let score = dailyTheme.attributeMap[val] || 0;
   attrsLeft--;
   document.getElementById("attrsLeft").textContent=attrsLeft;
   addHistoryItem(val,score);
@@ -308,40 +338,23 @@ document.getElementById("adminKey").addEventListener("click",()=>{
     THEMES.forEach((theme,index)=>{
       let btn=document.createElement("button");
       btn.textContent=theme.name;
-      btn.onclick=()=>{loadTheme(index); dropdown.style.display="none";}
+      btn.onclick=()=>{dailyThemeIndex=index; dailyTheme=THEMES[index]; dailyWord=dailyTheme.targetWord; attrsLeft=5; finalLeft=2; initGame();}
       dropdown.appendChild(btn);
     });
     dropdown.style.display="flex";
-  }else{alert("Incorrect PIN");}
+  }
 });
-function loadTheme(index){
-  dailyThemeIndex=index;
-  dailyTheme=THEMES[index];
-  dailyWord=dailyTheme.targetWord;
-  attrsLeft=5; finalLeft=2;
-  localStorage.setItem("themeIndex",index);
-  initGame();
-}
-
-// ===== LOAD LAST THEME =====
-if(localStorage.getItem("themeIndex")){
-  loadTheme(parseInt(localStorage.getItem("themeIndex")));
-}
-
-// ===== ENTER KEY =====
-document.getElementById("attrInput").addEventListener("keypress",(e)=>{
-  if(e.key==="Enter"){guessAttribute();}
-});
-document.getElementById("finalInput").addEventListener("keypress",(e)=>{
-  if(e.key==="Enter"){finalGuess();}
-});
-document.getElementById("attrBtn").addEventListener("click",guessAttribute);
-document.getElementById("finalBtn").addEventListener("click",finalGuess);
 
 // ===== HINT BUTTON =====
 document.getElementById("hintBtn").addEventListener("click",()=>{
   document.getElementById("hintText").textContent=dailyTheme.hint;
 });
+
+// ===== BUTTON EVENTS =====
+document.getElementById("attrBtn").addEventListener("click",guessAttribute);
+document.getElementById("finalBtn").addEventListener("click",finalGuess);
+document.getElementById("attrInput").addEventListener("keypress",(e)=>{if(e.key==="Enter") guessAttribute();});
+document.getElementById("finalInput").addEventListener("keypress",(e)=>{if(e.key==="Enter") finalGuess();});
 </script>
 </body>
 </html>
