@@ -1,17 +1,20 @@
-// ======= DOM =======
-const themeNameEl = document.getElementById("theme-name");
-const guessInput = document.getElementById("guess-input");
-const submitBtn = document.getElementById("submit-guess");
-const invalidWord = document.getElementById("invalid-word");
+// DOM elements
+const themeName = document.getElementById("themeName");
+const attrsLeftEl = document.getElementById("attrsLeft");
+const finalLeftEl = document.getElementById("finalLeft");
+const historyEl = document.getElementById("history");
+const invalidMsg = document.getElementById("invalidMsg");
+const wordHintEl = document.getElementById("wordHint");
+const hintTextEl = document.getElementById("hintText");
+const finalArea = document.getElementById("finalArea");
+const attrInput = document.getElementById("attrInput");
+const finalInput = document.getElementById("finalInput");
 const feedbackEl = document.getElementById("feedback");
-const attemptsEl = document.getElementById("attempt-count");
-const hintDisplay = document.getElementById("hint-display");
-const hintBtn = document.getElementById("hint-button");
-const mascotBtn = document.getElementById("chipBtn");
-const rulesModal = document.getElementById("rules-modal");
-const closeRules = document.getElementById("close-rules");
+const chipText = document.getElementById("chip-text");
+const adminKey=document.getElementById("adminKey");
+const adminDropdown=document.getElementById("adminDropdown");
 
-// ======= GAME DATA =======
+// GAME CONFIG
 const THEMES = [
   {
     name:"Volcano",
@@ -27,65 +30,106 @@ const THEMES = [
   }
 ];
 
+// STATE
 let dailyTheme = THEMES[0];
 let dailyWord = dailyTheme.targetWord;
-let attemptsLeft = 5;
+let attrsLeft = 5;
+let finalLeft = 2;
 
-// ======= STATE =======
-let guessedWords = {};
+// HISTORY CACHE
+let guessHistory = {};
 
-// ======= INIT =======
+// INIT
 function initGame(){
-  themeNameEl.textContent = dailyTheme.name;
-  attemptsEl.textContent = attemptsLeft;
-  hintDisplay.textContent = "";
-  feedbackEl.textContent = "";
-  guessInput.value = "";
-  guessedWords = {};
+  themeName.textContent = dailyTheme.name;
+  attrsLeft = 5; finalLeft = 2;
+  historyEl.innerHTML = ""; 
+  invalidMsg.style.display="none"; 
+  hintTextEl.textContent="";
+  finalArea.style.display="flex";
+  feedbackEl.textContent="";
+  attrInput.value=""; finalInput.value="";
+  guessHistory = {};
 }
 
-// ======= GUESS LOGIC =======
-function guessWord(){
-  let val = guessInput.value.trim().toLowerCase();
-  guessInput.value = "";
+// ATTRIBUTE GUESS
+function guessAttribute(){
+  let val = attrInput.value.trim().toLowerCase();
+  attrInput.value="";
   if(!val) return;
 
   if(!dailyTheme.words.includes(val)){
-    invalidWord.textContent="Not a listed word, try again";
-    setTimeout(()=>{invalidWord.textContent="";},1600);
+    invalidMsg.textContent="Not a listed word, try again";
+    invalidMsg.style.display="block";
+    setTimeout(()=>{invalidMsg.style.display="none"},1600);
     return;
   }
 
-  // Same word guess returns same score
-  let score;
-  if(guessedWords[val] !== undefined){
-    score = guessedWords[val];
-  } else {
-    score = (val === dailyWord)?100:Math.floor(Math.random()*70)+30;
-    guessedWords[val] = score;
-    attemptsLeft--;
-    attemptsEl.textContent = attemptsLeft;
-  }
+  if(guessHistory[val]) return; // prevent double counting
+  guessHistory[val]=true;
 
-  feedbackEl.textContent = `${val} scored ${score}`;
+  attrsLeft--;
+  let score = (val === dailyWord) ? 100 : Math.floor(Math.random()*70)+30;
+
+  addHistory(val,score);
+
+  if(attrsLeft<=0) finalArea.style.display="flex";
 }
 
-// ======= HINT =======
-hintBtn.addEventListener("click",()=>{hintDisplay.textContent=dailyTheme.hint});
+// FINAL GUESS
+function finalGuess(){
+  let val = finalInput.value.trim().toLowerCase();
+  finalInput.value="";
+  if(!val) return;
+  finalLeft--;
+  if(val === dailyWord){
+    feedbackEl.textContent="✅ Correct! You got the hidden word!";
+    return;
+  } else feedbackEl.textContent=`❌ Wrong! ${finalLeft} final guesses left`;
+  if(finalLeft<=0) feedbackEl.textContent=`Game Over! The word was "${dailyWord}"`;
+}
 
-// ======= SUBMIT EVENTS =======
-submitBtn.addEventListener("click",guessWord);
-guessInput.addEventListener("keypress",e=>{if(e.key==="Enter") guessWord()});
+// ADD HISTORY
+function addHistory(word,score){
+  let item = document.createElement("div");
+  item.className="history-item";
+  item.innerHTML=`<span>${word}</span><span>${score}</span>`;
+  historyEl.prepend(item);
+}
 
-// ======= MASCOT =======
-mascotBtn.addEventListener("click",()=>{alert("Hi! I'm Chip 🐶");});
+// EVENTS
+document.getElementById("hintBtn").addEventListener("click",()=>{hintTextEl.textContent=dailyTheme.hint; hintTextEl.style.color="red";});
+document.getElementById("attrBtn").addEventListener("click",guessAttribute);
+document.getElementById("finalBtn").addEventListener("click",finalGuess);
+attrInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") guessAttribute();});
+finalInput.addEventListener("keypress",(e)=>{if(e.key==="Enter") finalGuess();});
 
-// ======= RULES MODAL =======
-closeRules.addEventListener("click",()=>{
-  rulesModal.style.display="none";
+// CHIP ANIMATION
+document.getElementById("chipBtn").addEventListener("click",()=>{
+  chipText.style.display="block";
+  chipText.style.animation="fadeBubble 2s forwards";
+  setTimeout(()=>{chipText.style.display="none"},2000);
 });
 
-// ======= START GAME =======
-initGame();
+// ADMIN
+adminKey.addEventListener("click",()=>{
+  let pin=prompt("Enter admin PIN:");
+  if(pin==="1234"){
+    adminDropdown.innerHTML="";
+    THEMES.forEach((t,i)=>{
+      let btn=document.createElement("button");
+      btn.textContent=t.name;
+      btn.onclick=()=>{
+        dailyTheme=THEMES[i];
+        dailyWord=dailyTheme.targetWord;
+        initGame();
+        adminDropdown.style.display="none";
+      };
+      adminDropdown.appendChild(btn);
+    });
+    adminDropdown.style.display="flex";
+  } else alert("Wrong PIN");
+});
 
+initGame();
 
