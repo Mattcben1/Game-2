@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -7,19 +7,21 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- RULES MODAL (shows once per new visitor) -->
+
+  <!-- Rules modal (shown to first-time visitors) -->
   <div id="rulesModal" class="modal" aria-hidden="true">
     <div class="modal-card">
       <h2>Welcome to Theme-Me</h2>
-      <p class="muted">How to play (quick)</p>
+      <p class="muted">Quick How-to</p>
       <ul class="rules-list">
-        <li>You're shown a theme (top center).</li>
-        <li>Make up to <strong>5 attribute guesses</strong> related to the theme.</li>
-        <li>Each attribute returns a numeric score (0–100) telling how close it is.</li>
-        <li>After attribute guesses, you get up to <strong>2 final word guesses</strong>.</li>
-        <li>Press <em>Get Hint</em> for a subtle clue (displayed in red).</li>
+        <li>You're given a theme at the top center.</li>
+        <li>Make up to <strong>5 attribute guesses</strong> — each returns a numeric closeness score (0–100).</li>
+        <li>After attributes, you get up to <strong>2 final word guesses</strong>.</li>
+        <li>Press <strong>Get Hint</strong> for a subtle clue (hint shows in red).</li>
       </ul>
-      <button id="closeRules" class="btn primary">Let's Play</button>
+      <div class="modal-actions">
+        <button id="closeRules" class="btn primary">Let's Play</button>
+      </div>
     </div>
   </div>
 
@@ -43,29 +45,29 @@
       <section class="center-col">
         <div class="hint-block">
           <button id="hintBtn" class="btn">Get Hint</button>
-          <div id="hintText" class="hint-text"></div>
+          <div id="hintText" class="hint-text" aria-live="polite"></div>
         </div>
 
-        <div class="guess-box">
+        <div class="guess-row">
           <input id="attrInput" class="text-input" placeholder="Enter an attribute (e.g. 'lava')" autocomplete="off">
           <button id="attrBtn" class="btn">Guess</button>
-          <div id="invalidMsg" class="invalid-msg" aria-live="polite"></div>
         </div>
+        <div id="invalidMsg" class="invalid-msg"></div>
 
-        <div id="history" class="history"></div>
+        <div id="history" class="history" aria-live="polite"></div>
 
         <div id="finalArea" class="final-area" style="display:none">
           <input id="finalInput" class="text-input" placeholder="Guess the hidden word">
           <button id="finalBtn" class="btn secondary">Submit Guess</button>
         </div>
 
-        <div id="feedback" class="feedback"></div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
       </section>
 
       <aside class="right-col">
         <div class="status-card">
           <div class="status-row"><span>Attributes left</span><strong id="attrsLeft">5</strong></div>
-          <div class="status-row"><span>Final guesses left</span><strong id="finalLeft">2</strong></div>
+          <div class="status-row"><span>Finals left</span><strong id="finalLeft">2</strong></div>
           <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
         </div>
 
