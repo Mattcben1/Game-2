@@ -1,61 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Theme Explorer</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Theme-Me Deluxe</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-  <header>
-    <h1 id="game-title">Theme Explorer</h1>
-    <div id="adminKey" title="Admin Key">🔑</div>
-  </header>
-
-  <div class="theme-display">
-    <span id="themeName">Loading...</span>
+  <!-- RULES MODAL (shows once per new visitor) -->
+  <div id="rulesModal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <h2>Welcome to Theme-Me</h2>
+      <p class="muted">How to play (quick)</p>
+      <ul class="rules-list">
+        <li>You're shown a theme (top center).</li>
+        <li>Make up to <strong>5 attribute guesses</strong> related to the theme.</li>
+        <li>Each attribute returns a numeric score (0–100) telling how close it is.</li>
+        <li>After attribute guesses, you get up to <strong>2 final word guesses</strong>.</li>
+        <li>Press <em>Get Hint</em> for a subtle clue (displayed in red).</li>
+      </ul>
+      <button id="closeRules" class="btn primary">Let's Play</button>
+    </div>
   </div>
 
-  <main>
-    <div id="hint-box">
-      <button id="hintBtn">Get Hint</button>
-      <p id="hintText" class="red-text"></p>
-    </div>
-
-    <div id="guess-box">
-      <input id="attrInput" type="text" placeholder="Enter an attribute" autocomplete="off">
-      <button id="attrBtn">Guess</button>
-      <p id="invalidMsg" class="red-text"></p>
-    </div>
-
-    <div id="history" class="history"></div>
-
-    <div id="finalArea">
-      <input id="finalInput" type="text" placeholder="Guess the hidden word">
-      <button id="finalBtn">Submit Guess</button>
-    </div>
-
-    <div id="feedback"></div>
-  </main>
-
-  <aside>
-    <div class="mascot">
-      <div id="chip-container">
-        🐶
-        <div id="chip-text" class="speech-bubble">I like socks</div>
+  <div class="app">
+    <header class="app-header">
+      <div class="left-head">
+        <div id="brandBadge">Theme-Me</div>
+        <div class="meta">5 attributes → 2 final guesses</div>
       </div>
-      <button id="chipBtn">Press Me — Chip</button>
+      <div class="right-head">
+        <button id="adminKey" class="icon-btn" title="Admin">🔑</button>
+      </div>
+    </header>
+
+    <div class="theme-banner" id="themeBanner">
+      <div id="themeName" class="theme-name">Loading theme…</div>
+      <div id="themeBadge" class="theme-badge"></div>
     </div>
-    <div id="adminDropdown" class="adminDropdown"></div>
-  </aside>
 
-  <footer>
-    <div class="producer">Produced by the greatest game player of all time 🏆</div>
-  </footer>
-</div>
+    <main class="layout">
+      <section class="center-col">
+        <div class="hint-block">
+          <button id="hintBtn" class="btn">Get Hint</button>
+          <div id="hintText" class="hint-text"></div>
+        </div>
 
-<script src="script.js"></script>
+        <div class="guess-box">
+          <input id="attrInput" class="text-input" placeholder="Enter an attribute (e.g. 'lava')" autocomplete="off">
+          <button id="attrBtn" class="btn">Guess</button>
+          <div id="invalidMsg" class="invalid-msg" aria-live="polite"></div>
+        </div>
+
+        <div id="history" class="history"></div>
+
+        <div id="finalArea" class="final-area" style="display:none">
+          <input id="finalInput" class="text-input" placeholder="Guess the hidden word">
+          <button id="finalBtn" class="btn secondary">Submit Guess</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+      </section>
+
+      <aside class="right-col">
+        <div class="status-card">
+          <div class="status-row"><span>Attributes left</span><strong id="attrsLeft">5</strong></div>
+          <div class="status-row"><span>Final guesses left</span><strong id="finalLeft">2</strong></div>
+          <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+        </div>
+
+        <div class="mascot-card">
+          <div id="chipContainer" class="chip">
+            <div id="chipEmoji" class="chip-emoji">🐶</div>
+            <div id="chipBubble" class="chip-bubble">I like socks</div>
+          </div>
+          <button id="chipBtn" class="btn">Press Me — Chip</button>
+        </div>
+
+        <div id="adminDropdown" class="admin-dropdown" aria-hidden="true"></div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <div class="producer">Produced by the greatest game player of all time</div>
+    </footer>
+  </div>
+
+  <script defer src="script.js"></script>
 </body>
 </html>
+
 
