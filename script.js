@@ -1,318 +1,477 @@
-// ------------- Theme-Me main script -------------
-const ADMIN_PIN = "1234";
-const RULES_KEY = "themeMe_seenRules_v1";
+/* EchoGuess prototype
+   - 3 clue types: visual fragment, sound, historic text
+   - Progressive reveal: each guess (if incorrect) reveals the next clue
+   - Admin key lets you switch theme
+   - All client-side; data small sample for testing
+*/
 
-// DOM
-const rulesModal = document.getElementById("rulesModal");
-const closeRulesBtn = document.getElementById("closeRules");
-const themeNameEl = document.getElementById("themeName");
-const themeBanner = document.getElementById("themeBanner");
-const hintBtn = document.getElementById("hintBtn");
-const hintText = document.getElementById("hintText");
-const attrInput = document.getElementById("attrInput");
-const attrBtn = document.getElementById("attrBtn");
-const invalidMsg = document.getElementById("invalidMsg");
-const historyEl = document.getElementById("history");
-const finalArea = document.getElementById("finalArea");
-const finalInput = document.getElementById("finalInput");
-const finalBtn = document.getElementById("finalBtn");
-const feedbackEl = document.getElementById("feedback");
-const attrsLeftEl = document.getElementById("attrsLeft");
-const finalLeftEl = document.getElementById("finalLeft");
-const progressBar = document.getElementById("progressBar");
-const chipBtn = document.getElementById("chipBtn");
-const chipBubble = document.getElementById("chipBubble");
-const adminKey = document.getElementById("adminKey");
-const adminDropdown = document.getElementById("adminDropdown");
-
-// STATE
-let THEMES = [
-  // ------------- National Parks (≈160 words) -------------
+// ------- Sample theme data (expandable) -------
+const THEMES = [
   {
     name: "National Parks",
-    hint: "Think iconic U.S. parks, features, trails and wildlife",
-    targetWord: "yellowstone",
     palette: { accent: "#2e6b3b", accent2: "#7bbf6b", bg: "#ecf8ee" },
+    // words: array of {word, clues: {visualLevel: [svg fragments], soundSeed, facts: [text clues]}}
     words: [
-      "yellowstone","yosemite","zion","grandcanyon","sequoia","glacier","rocky","everglades","acadia","denali","joshua","arches",
-      "bryce","badlands","mesa","hiking","trail","summit","campground","ranger","geyser","hotpot","geyserbasin","mammoth",
-      "obsidian","meadow","waterfall","valley","halfdome","elcapitan","redwood","timberline","wildflower","grove","oldfaithful",
-      "caldera","canyon","cliff","overlook","vista","river","creek","lake","island","coast","sandstone","butte","plateau","buttearch",
-      "bison","bear","elk","moose","wolf","mountain","cabin","camp","trailhead","switchback","snowcap","glacierlake","ridge","plateau",
-      "petrified","dunes","sandhill","estuary","saltmarsh","fen","springs","mudpots","sulfur","hikingboot","backpack","scenicdrive",
-      "visitorcenter","lookout","trailmarker","canoe","kayak","delta","cairn","granite","basalt","limestone","karst","cave","stalactite",
-      "stalagmite","fossil","prairie","grassland","slope","pine","fir","spruce","juniper","sagebrush","prairiedog","pronghorn","antelope",
-      "rapids","whitewater","raft","campsite","picnic","heritage","monument","preserve","sanctuary","wilderness","concession","trailmap",
-      "rangerstation","entrance","parkway","lookoutpoint","rockfall","avalanche","birdwatch","eagle","falcon","owlet","sunrise","sunset",
-      "stargaze","darksky","dayhike","overnight","permit","backcountry","snowshoe","iceaxe","bridge","boardwalk","coquina","seagrass",
-      "sandbar","cliffside","lagoon","estuaries","marsh","saltflat","lavafield","lavaflow","lava tube","lava dome","basaltcolumn","geyserite",
-      "hydrothermal","sinter","geyserpool","thermal","hot spring","fumarole","mud volcano","boiling","mammothhot"
+      {
+        word: "yellowstone",
+        visual: generateParkSVG("geyser"), // generate base SVG - we'll control fragment reveal
+        soundSeed: [220, 330, 440],
+        facts: [
+          "One of the first national parks in the world.",
+          "Famous for geothermal features and bison herds.",
+          "Home to Old Faithful geyser."
+        ]
+      },
+      {
+        word: "yosemite",
+        visual: generateParkSVG("granite"),
+        soundSeed: [130, 196, 261],
+        facts: [
+          "Granite cliffs and giant sequoias define this park.",
+          "Half Dome and El Capitan are iconic formations.",
+          "Located in California's Sierra Nevada."
+        ]
+      }
     ]
   },
-
-  // ------------- Mountain Gear (≈160 words) -------------
-  {
-    name: "Mountain Gear",
-    hint: "Tools, clothing and equipment for alpine travel and climbing",
-    targetWord: "crampon",
-    palette: { accent: "#2b3a49", accent2: "#748199", bg: "#f3f6f8" },
-    words: [
-      "crampon","iceaxe","harness","carabiner","quickdraw","rope","belay","prusik","helmet","chalkbag","piton","bolt","anchor","slab",
-      "overhang","trad","sport","boulder","bouldering","cam","nut","hex","sling","webbing","ascender","descender","figureeight","prusikloop",
-      "icehammer","icepiton","gaiters","mountaineeringboot","approachshoe","hardshell","softshell","insulation","puffy","downjacket","fleece",
-      "baseLayer","midlayer","merino","gloves","mittens","balaclava","beanie","sunglasses","goggles","headlamp","stove","canister","fuel",
-      "cookpot","spork","thermos","hydration","pack","backpack","packframe","hipbelt","compressionstrap","trekkingpole","ropebag","haulbag",
-      "portaledge","pitonhammer","tape","route","pitch","anchorstation","belaystation","rappel","abseil","scramble","ridge","summit","basecamp",
-      "glacier","crevasse","snowbridge","serac","arete","col","cairn","approach","viaferrata","bivy","bivouac","sleepingbag","inflatablepad",
-      "foamPad","drybag","map","compass","gps","altimeter","waterproof","breathable","seams","reinforced","toe rand","lace","sole","vibram",
-      "heelhook","toehook","slinganchor","nuttool","bolthanger","toprope","lead","screamer","cordalette","dyneema","spectra","oxford","nylon",
-      "carryingharness","haul","anchorbend","bowline","figure8","prusikminding","gri-gri","ascenderdevice","ice-screw","snowshoes","ski",
-      "skins","avalanche","transceiver","probe","shovel","ski-touring","skintrack","sled","sledpack","guidebook","routebook"
-    ]
-  },
-
-  // ------------- Coffee Drinks (≈160 words) -------------
   {
     name: "Coffee Drinks",
-    hint: "Beverages, brewing, beans, roasts and café terms",
-    targetWord: "cappuccino",
     palette: { accent: "#6b4a2a", accent2: "#c79a6a", bg: "#fbf6f1" },
     words: [
-      "espresso","americano","latte","cappuccino","macchiato","mocha","flatwhite","cortado","ristretto","longshot","breve","affogato",
-      "pour-over","frenchpress","aeropress","coldbrew","nitro","drip","chemex","v60","siphon","roast","lightroast","mediumroast","darkroast",
-      "blonde","singleorigin","blend","arabica","robusta","bean","greenbean","roaster","barista","steamwand","froth","microfoam","crema",
-      "tamping","tamper","portafilter","grouphead","grinder","burr","grindsize","coarse","medium","fine","dose","extraction","preinfusion",
-      "brewratio","watertemp","brewtime","channeling","tampingpressure","milk","steamedmilk","latteart","syrup","vanilla","caramel","hazelnut",
-      "shot","double","single","milksteamed","skim","oatmilk","almondmilk","soymilk","fullcream","cup","mug","demitasse","porcelain","papercup",
-      "takeaway","brightness","body","finish","aftertaste","notes","floral","chocolate","nutty","fruity","citrus","berry","caramelized",
-      "toasty","smoky","fermentation","washed","natural","honey","processing","mill","farm","altitude","shadegrown","blendhouse","brewbar",
-      "steam","pressure","9bar","pump","cupsize","tampingmat","knockbox","shotglass","portafilterbasket","filter","paperfilter","siphonfilter",
-      "espresso machine","steamsteam","pouroverstand","gooseneck","scale","timer","cupwarmer","baristahat","roastery","cupping","cuppingform"
+      {
+        word: "cappuccino",
+        visual: generateCoffeeSVG("cup"),
+        soundSeed: [440, 392, 330],
+        facts: [
+          "An Italian espresso-based coffee drink.",
+          "Traditionally topped with dense milk foam.",
+          "Often dusted with cocoa powder."
+        ]
+      },
+      {
+        word: "latte",
+        visual: generateCoffeeSVG("latte"),
+        soundSeed: [392, 440, 523],
+        facts: [
+          "Made with espresso and a larger proportion of steamed milk.",
+          "Commonly served in a large cup and used for latte art.",
+          "Milder and creamier than a cappuccino."
+        ]
+      }
     ]
   },
-
-  // ------------- Classic Rock Bands (≈150 words) -------------
   {
     name: "Classic Rock Bands",
-    hint: "Legendary bands, guitar heroes, amps, classics and album lore",
-    targetWord: "ledzeppelin",
     palette: { accent: "#581717", accent2: "#d04b4b", bg: "#fff7f7" },
     words: [
-      "ledzeppelin","rollingstones","thewho","pinkfloyd","fleetwoodmac","thebeatles","aerosmith","acdc","queen","eagles","creedence",
-      "tompetty","u2","vanhalen","deep purple","black sabbath","jimi hendrix","jimihendrix","gilmour","waters","plant","page","bonham",
-      "guitar","bass","drums","leadguitar","rhythm","solo","riff","powerchord","amp","marshall","fender","gibson","stratocaster","lespaul",
-      "humbucker","overdrive","wah","phaser","chorus","delay","reverb","album","vinyl","LP","single","bside","track","setlist","encore",
-      "tour","arena","stadium","roadie","soundcheck","mixing","mastering","producer","engineer","drumkit","cymbal","hi-hat","snare",
-      "bassdrum","pedalboard","amphead","cabinet","microphone","vocal","harmonica","slideguitar","bottleneck","sitar","organ","keyboard",
-      "piano","synth","moog","rhodes","verse","chorus","bridge","hook","anthem","ballad","bluesrock","psych","prog","hardrock","softrock",
-      "punk","hairmetal","stadiumrock","tribute","cover","remaster","boxset","bootleg","demo","session","soundtrack","biopic","liner",
-      "notes","albumart","poster","roadcase","tourbus","merch","t-shirt","backline","soundman","monitor","mix"
+      {
+        word: "ledzeppelin",
+        visual: generateMusicSVG("zeppelin"),
+        soundSeed: [110, 220, 330],
+        facts: [
+          "Led Zeppelin is known for hard rock and blues influences.",
+          "The song 'Stairway to Heaven' is one of their most famous tracks.",
+          "Jimmy Page was the band's lead guitarist."
+        ]
+      },
+      {
+        word: "beatles",
+        visual: generateMusicSVG("beatles"),
+        soundSeed: [262, 330, 392],
+        facts: [
+          "Iconic band from Liverpool influential in the 1960s.",
+          "Their album 'Abbey Road' features a famous zebra crossing photo.",
+          "Members included John, Paul, George and Ringo."
+        ]
+      }
     ]
   }
 ];
 
+// ---- UI elements ----
+const introModal = document.getElementById("introModal");
+const closeIntro = document.getElementById("closeIntro");
+const themeTitle = document.getElementById("themeTitle");
+const themeSub = document.getElementById("themeSubtitle");
+const visualFragment = document.getElementById("visualFragment");
+const playSoundBtn = document.getElementById("playSound");
+const replaySoundBtn = document.getElementById("replaySound");
+const clueStack = document.getElementById("clueStack");
+const guessInput = document.getElementById("guessInput");
+const guessBtn = document.getElementById("guessBtn");
+const invalidMsg = document.getElementById("invalidMsg");
+const historyEl = document.getElementById("history");
+const finalBlock = document.getElementById("finalBlock");
+const finalInput = document.getElementById("finalInput");
+const finalBtn = document.getElementById("finalBtn");
+const feedback = document.getElementById("feedback");
+const cluesUsedEl = document.getElementById("cluesUsed");
+const finalsLeftEl = document.getElementById("finalsLeft");
+const progressBar = document.getElementById("progressBar");
+const chipBtn = document.getElementById("chipBtn");
+const chipBubble = document.getElementById("chipBubble");
+const adminKey = document.getElementById("adminKey");
+const adminPanel = document.getElementById("adminPanel");
+const themeSelect = document.getElementById("themeSelect");
+const applyThemeBtn = document.getElementById("applyTheme");
+const adminPanelCard = document.getElementById("adminPanel");
+
+// ------- Game state -------
 let currentTheme = null;
-let targetWord = "";
-let attrsLeft = 5;
+let currentEntry = null; // chosen word object
+let clueStage = 0; // 0=none, 1=visual revealed, 2=sound revealed, 3=fact shown
+let history = []; // guesses
 let finalsLeft = 2;
-let guessScores = {};   // store computed scores for consistency
-let historyList = [];   // {word,score}
+let audioCtx = null;
 
-// Several helper utilities
-function applyPalette(p){
-  if(!p) return;
-  document.documentElement.style.setProperty("--accent", p.accent);
-  document.documentElement.style.setProperty("--accent2", p.accent2);
-  document.documentElement.style.setProperty("--bg", p.bg);
-  // update banner quickly
-  const banner = document.getElementById("themeBanner");
-  if(banner) banner.style.background = "transparent";
+// ------- Utilities and small helpers -------
+
+function setPalette(pal) {
+  if(!pal) return;
+  document.documentElement.style.setProperty("--accent", pal.accent);
+  document.documentElement.style.setProperty("--accent2", pal.accent2);
+  document.documentElement.style.setProperty("--bg", pal.bg || "#f0f6f2");
 }
 
-function showRulesIfNeeded(){
-  const seen = localStorage.getItem(RULES_KEY);
-  if(!seen){
-    rulesModal.style.display = "flex";
-    rulesModal.setAttribute("aria-hidden","false");
+function uid(){ return Math.random().toString(36).slice(2,9); }
+
+// ---- SVG generators for mock visuals (no external images) ----
+function generateParkSVG(kind){
+  // returns a string of simple SVG with shapes; kind distinguishes small iconography
+  const id = uid();
+  if(kind==="geyser"){
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="none">
+      <rect width="100%" height="100%" fill="#f6fff6"/>
+      <g transform="translate(40,40)">
+        <ellipse cx="100" cy="160" rx="80" ry="30" fill="#d4f0d4"/>
+        <rect x="80" y="20" width="40" height="80" rx="12" fill="#ffe7d6"/>
+        <g fill="#fff6f0" opacity="0.9"><ellipse cx="100" cy="40" rx="18" ry="10"/></g>
+        <text x="10" y="210" font-size="18" fill="#2b6b36">Geyser field</text>
+      </g>
+    </svg>`;
   } else {
-    rulesModal.style.display = "none";
-    rulesModal.setAttribute("aria-hidden","true");
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="none">
+      <rect width="100%" height="100%" fill="#f6fff6"/>
+      <g transform="translate(20,20)"><rect x="10" y="70" width="360" height="140" rx="12" fill="#e9f8e9"/>
+        <path d="M30 180 L120 50 L210 150 L300 40 L360 160" fill="none" stroke="#6aa56a" stroke-width="10" stroke-linecap="round"/>
+        <text x="14" y="230" font-size="16" fill="#2b6b36">Granite cliffs</text></g>
+    </svg>`;
   }
 }
 
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[ch])); }
-
-// choose initial theme (persisted or random)
-function pickInitialTheme(){
-  const saved = localStorage.getItem("themeMe_selectedTheme_v1");
-  if(saved){
-    const t = THEMES.find(x=>x.name===saved);
-    if(t) return t;
+function generateCoffeeSVG(kind){
+  if(kind==="cup"){
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="none">
+      <rect width="100%" height="100%" fill="#fffaf6"/>
+      <g transform="translate(40,20)">
+        <ellipse cx="160" cy="180" rx="110" ry="22" fill="#efe0d0"/>
+        <rect x="60" y="70" width="200" height="110" rx="54" fill="#f6e7d8"/>
+        <ellipse cx="160" cy="82" rx="56" ry="18" fill="#fff6f0"/>
+        <text x="10" y="220" font-size="16" fill="#6b4a2a">Served warm</text>
+      </g>
+    </svg>`;
   }
-  // pick random theme
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="none">
+    <rect width="100%" height="100%" fill="#fffaf6"/>
+    <g transform="translate(20,30)"><circle cx="120" cy="120" r="80" fill="#f3e6d8"/><text x="6" y="230" font-size="16" fill="#6b4a2a">Cafe scene</text></g>
+  </svg>`;
+}
+
+function generateMusicSVG(kind){
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="none">
+    <rect width="100%" height="100%" fill="#fff9f9"/>
+    <g transform="translate(40,30)"><rect x="30" y="40" width="300" height="160" rx="12" fill="#fff0f2"/>
+      <circle cx="90" cy="120" r="24" fill="#ffe7e7"/><text x="12" y="220" font-size="16" fill="#5a1717">Vintage stage</text></g>
+  </svg>`;
+}
+
+// ------ Sound generator (WebAudio simple melody) ------
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playSeed(seed){
+  // seed: array of frequencies
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.001, now);
+  gain.connect(audioCtx.destination);
+  let t = now;
+  seed.forEach((f, i) => {
+    const o = audioCtx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(f, t);
+    o.connect(gain);
+    o.start(t);
+    // ramp up and stop
+    gain.gain.exponentialRampToValueAtTime(0.12, t + 0.02);
+    o.stop(t + 0.28 + i * 0.02);
+    t += 0.28;
+  });
+}
+
+// ------- Game flow functions -------
+function pickThemeRandom(){
   return THEMES[Math.floor(Math.random()*THEMES.length)];
 }
 
-// set theme object
-function setTheme(theme){
-  currentTheme = (typeof theme === "string") ? THEMES.find(t=>t.name===theme) : theme;
-  if(!currentTheme) currentTheme = THEMES[0];
-  targetWord = currentTheme.targetWord.toLowerCase();
-  themeNameEl.textContent = currentTheme.name;
-  applyPalette(currentTheme.palette);
-  resetRound();
-  localStorage.setItem("themeMe_selectedTheme_v1", currentTheme.name);
-  buildAdminDropdown();
+function pickWordFromTheme(theme){
+  return theme.words[Math.floor(Math.random()*theme.words.length)];
 }
 
-// reset round state
-function resetRound(){
-  attrsLeft = 5; finalsLeft = 2;
-  guessScores = {}; historyList = [];
+function applyTheme(theme){
+  currentTheme = theme;
+  setPalette(theme.palette);
+  themeTitle.textContent = theme.name;
+  // pick word
+  currentEntry = pickWordFromTheme(theme);
+  // reset round
+  clueStage = 0;
+  history = [];
+  finalsLeft = 2;
+  updateUI();
+  renderVisualFragment(0); // initial very vague visual
+  clearClues();
+}
+
+function updateUI(){
+  cluesUsedEl.textContent = `${clueStage} / 3`;
+  finalsLeftEl.textContent = finalsLeft;
+  progressBar.style.width = `${Math.round((clueStage/3)*100)}%`;
+  document.getElementById("themeSubtitle").textContent = "Daily challenge";
   historyEl.innerHTML = "";
+  feedback.textContent = "";
   invalidMsg.textContent = "";
-  feedbackEl.textContent = "";
-  attrInput.value = "";
-  finalInput.value = "";
-  finalArea.style.display = "none";
-  attrsLeftEl.textContent = attrsLeft;
-  finalLeftEl.textContent = finalsLeft;
-  progressBar.style.width = "0%";
+  clueStack.innerHTML = "";
+  // populate history if any
+  history.forEach(h => addHistoryItem(h.word, h.correct));
 }
 
-// scoring heuristic (deterministic per round for a word)
-function scoreFor(word){
-  const w = word.toLowerCase();
-  if(guessScores[w] !== undefined) return guessScores[w];
-  const t = targetWord;
-  // letter set match
-  const aSet = new Set(w.split(''));
-  let matches = 0;
-  aSet.forEach(ch => { if(t.includes(ch)) matches++; });
-  // position match bonus
-  let pos = 0;
-  for(let i=0;i<Math.min(w.length,t.length);i++) if(w[i]===t[i]) pos++;
-  // substring bonus
-  const substr = (t.includes(w) || w.includes(t)) ? 2 : 0;
-  let base = Math.min(90, 30 + matches*8 + pos*4 + substr*6);
-  if(w === t) base = 100;
-  base = Math.max(0, Math.min(100, Math.round(base)));
-  guessScores[w] = base;
-  return base;
+function clearClues(){ clueStack.innerHTML = ""; }
+
+function revealNextClue(){
+  // increments clueStage and reveals appropriate clue piece
+  if(clueStage >= 3) return;
+  clueStage++;
+  cluesUsedEl.textContent = `${clueStage} / 3`;
+  progressBar.style.width = `${Math.round((clueStage/3)*100)}%`;
+
+  if(clueStage === 1){
+    // refine visual a bit
+    renderVisualFragment(1);
+    addClue("Image fragment becomes clearer.");
+  } else if(clueStage === 2){
+    // play sound and show small note
+    renderVisualFragment(2);
+    addClue("Listen to this sound for a hint.");
+    // also auto-play sound once
+    if(currentEntry && currentEntry.soundSeed) playSeed(currentEntry.soundSeed);
+  } else if(clueStage === 3){
+    // show textual fact (first one)
+    renderVisualFragment(3);
+    if(currentEntry && currentEntry.facts && currentEntry.facts[0]){
+      addClue(currentEntry.facts[0]);
+    } else {
+      addClue("Historical hint appears.");
+    }
+    // show final guess UI
+    document.getElementById("finalBlock").style.display = "flex";
+  }
 }
 
-// add history item UI
-function addHistory(word,score){
+function addClue(text){
+  const d = document.createElement("div");
+  d.className = "clue-item";
+  d.innerHTML = `<div class="clue-meta">${escapeHtml(text)}</div>`;
+  clueStack.appendChild(d);
+}
+
+function addHistoryItem(word, correct){
   const div = document.createElement("div");
-  div.className = "history-item";
-  div.innerHTML = `<div class="word">${escapeHtml(word)}</div><div class="score">${score}</div>`;
+  div.className = "item";
+  div.innerHTML = `<div>${escapeHtml(word)}</div><div>${correct ? '✓' : '✕'}</div>`;
   historyEl.prepend(div);
 }
 
-// handle attribute guess
-function handleAttrGuess(){
-  const val = attrInput.value.trim().toLowerCase();
-  attrInput.value = "";
-  if(!val) return;
-  if(!currentTheme.words.includes(val)){
-    invalidMsg.textContent = "Not a listed word, try again";
-    setTimeout(()=> invalidMsg.textContent = "", 1400);
-    return;
-  }
-  // if already guessed, show same score and don't consume a guess
-  if(guessScores[val] !== undefined){
-    const s = guessScores[val];
-    feedbackEl.textContent = `${val} → ${s}`;
-    return;
-  }
-  const s = scoreFor(val);
-  addHistory(val,s);
-  historyList.unshift({word:val,score:s});
-  attrsLeft--;
-  attrsLeftEl.textContent = attrsLeft;
-  const done = 5 - attrsLeft;
-  progressBar.style.width = `${Math.round((done/5)*100)}%`;
-  feedbackEl.textContent = `${val} → ${s}`;
-  if(attrsLeft <= 0) finalArea.style.display = "flex";
+// escape
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[ch])); }
+
+// render visual fragment variants (0..3)
+function renderVisualFragment(level){
+  // level 0: very vague (blur + low opacity)
+  // level 1: clearer shapes
+  // level 2: colored shapes
+  // level 3: full clarity + label hidden (still no word)
+  const svg = currentEntry.visual || `<svg><rect></rect></svg>`;
+  // technique: wrap the svg and apply CSS filters based on level
+  visualFragment.innerHTML = "";
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = svg;
+  const svgel = wrapper.firstElementChild;
+  if(!svgel) return;
+  // apply filter styles
+  let filter = "";
+  if(level === 0) filter = "blur(6px) saturate(0.6) brightness(0.95)";
+  if(level === 1) filter = "blur(3px) saturate(0.8)";
+  if(level === 2) filter = "blur(1px) saturate(1.0)";
+  if(level === 3) filter = "none";
+  svgel.style.width = "100%";
+  svgel.style.height = "100%";
+  svgel.style.filter = filter;
+  visualFragment.appendChild(svgel);
 }
 
-// handle final guess
-function handleFinalGuess(){
+// evaluate guess
+function handleGuess(){
+  const val = guessInput.value.trim().toLowerCase();
+  guessInput.value = "";
+  if(!val) return;
+  if(!currentEntry) return;
+  // validate against seed words in theme (we'll consider all words of theme valid guesses)
+  const validWords = currentTheme.words.map(w=>w.word);
+  if(!validWords.includes(val)){
+    invalidMsg.textContent = "Not a listed word for this theme — try another related word";
+    setTimeout(()=> invalidMsg.textContent = "", 1300);
+    return;
+  }
+  // if guess matches target
+  if(val === currentEntry.word){
+    // award points based on clueStage (earlier -> more points)
+    const points = 100 - (clueStage * 20);
+    feedback.textContent = `🎉 Correct! "${currentEntry.word}" — you scored ${points} points.`;
+    addHistoryItem(val, true);
+    // reveal all facts
+    if(currentEntry.facts){
+      currentEntry.facts.forEach(f => addClue(f));
+      clueStage = 3;
+      cluesUsedEl.textContent = `${clueStage} / 3`;
+      progressBar.style.width = `100%`;
+    }
+    // lock inputs
+    disableGameplay();
+    return;
+  } else {
+    // wrong guess — reveal next clue and record history
+    addHistoryItem(val, false);
+    revealNextClue();
+    if(clueStage >= 3){
+      feedback.textContent = `Clues nearly exhausted — try final guesses!`;
+      finalBlock.style.display = "flex";
+    } else {
+      feedback.textContent = `Not it — here's another hint.`;
+    }
+  }
+}
+
+// final guess handler
+function handleFinal(){
   const val = finalInput.value.trim().toLowerCase();
   finalInput.value = "";
   if(!val) return;
   finalsLeft--;
-  finalLeftEl.textContent = finalsLeft;
-  if(val === targetWord){
-    feedbackEl.textContent = `🎉 Correct! The hidden word was "${targetWord}".`;
-    finalArea.style.display = "none";
+  finalsLeftEl.textContent = finalsLeft;
+  if(val === currentEntry.word){
+    feedback.textContent = `🎉 Final correct! The word was "${currentEntry.word}".`;
+    addHistoryItem(val, true);
+    disableGameplay();
     return;
   } else {
-    feedbackEl.textContent = `❌ Wrong. ${finalsLeft} final guesses left.`;
-  }
-  if(finalsLeft <= 0){
-    feedbackEl.textContent = `💀 Out of tries — the word was "${targetWord}".`;
-    finalArea.style.display = "none";
-  }
-}
-
-// show hint in red
-function showHint(){
-  if(currentTheme && currentTheme.hint){
-    hintText.textContent = currentTheme.hint;
-    hintText.style.color = "red";
+    addHistoryItem(val, false);
+    feedback.textContent = `❌ Wrong final guess. ${finalsLeft} left.`;
+    if(finalsLeft <= 0){
+      feedback.textContent = `Game over — the word was "${currentEntry.word}".`;
+      revealAllFacts();
+      disableGameplay();
+    }
   }
 }
 
-// chip bubble animation
-function showChip(){
+function revealAllFacts(){
+  if(currentEntry.facts){
+    currentEntry.facts.forEach(f => addClue(f));
+  }
+}
+
+// disable further input after win/loss
+function disableGameplay(){
+  guessBtn.disabled = true;
+  guessInput.disabled = true;
+  finalBtn.disabled = true;
+  finalInput.disabled = true;
+}
+
+// --- chip bubble ---
+function showChipBubble(){
   chipBubble.classList.add("show");
-  setTimeout(()=> chipBubble.classList.remove("show"), 2000);
+  setTimeout(()=> chipBubble.classList.remove("show"), 1800);
 }
 
-// admin dropdown builder
-function buildAdminDropdown(){
-  adminDropdown.innerHTML = "";
-  THEMES.forEach(t=>{
-    const b = document.createElement("button");
-    b.textContent = t.name;
-    b.className = "btn";
-    b.style.background = "#fff";
-    b.style.color = "var(--accent)";
-    b.addEventListener("click", ()=> {
-      setTheme(t.name);
-      adminDropdown.style.display = "none";
-    });
-    adminDropdown.appendChild(b);
+// --- admin behavior ---
+function setupAdmin(){
+  // populate select
+  themeSelect.innerHTML = "";
+  THEMES.forEach((t, i) => {
+    const opt = document.createElement("option");
+    opt.value = i; opt.textContent = t.name;
+    themeSelect.appendChild(opt);
+  });
+  adminKey.addEventListener("click", () => {
+    const pin = prompt("Enter admin PIN:");
+    if(pin === "1234") {
+      adminPanel.classList.toggle("hidden");
+      adminPanelCard.classList.toggle("hidden");
+    } else alert("Wrong PIN");
+  });
+  applyThemeBtn.addEventListener("click", () => {
+    const idx = parseInt(themeSelect.value, 10);
+    if(!Number.isNaN(idx)) applyTheme(THEMES[idx]);
   });
 }
 
-// admin key handler
-adminKey.addEventListener("click", ()=>{
-  const pin = prompt("Enter admin PIN:");
-  if(pin === ADMIN_PIN){
-    adminDropdown.style.display = adminDropdown.style.display === "flex" ? "none" : "flex";
+// apply theme index
+function applyTheme(theme){
+  applyTheme(theme);
+}
+
+// initial setup & wiring
+function wireEvents(){
+  closeIntro.addEventListener("click", ()=> {
+    introModal.style.display = "none";
+    localStorage.setItem("echoguess_seen_intro_v1", "1");
+  });
+
+  guessBtn.addEventListener("click", handleGuess);
+  guessInput.addEventListener("keydown", e => { if(e.key === "Enter") handleGuess(); });
+  finalBtn.addEventListener("click", handleFinal);
+  finalInput.addEventListener("keydown", e => { if(e.key === "Enter") handleFinal(); });
+  chipBtn.addEventListener("click", showChipBubble);
+  playSoundBtn.addEventListener("click", () => { if(currentEntry) playSeed(currentEntry.soundSeed); });
+  replaySoundBtn.addEventListener("click", () => { if(currentEntry) playSeed(currentEntry.soundSeed); });
+
+  setupAdmin();
+}
+
+// show intro if needed
+function showIntroIfNeeded(){
+  const seen = localStorage.getItem("echoguess_seen_intro_v1");
+  if(!seen) {
+    introModal.style.display = "flex";
   } else {
-    alert("Wrong PIN");
+    introModal.style.display = "none";
   }
-});
+}
 
-// wire UI events
-attrBtn.addEventListener("click", handleAttrGuess);
-attrInput.addEventListener("keypress", e => { if(e.key === "Enter") handleAttrGuess(); });
-finalBtn.addEventListener("click", handleFinalGuess);
-finalInput.addEventListener("keypress", e => { if(e.key === "Enter") handleFinalGuess(); });
-hintBtn.addEventListener("click", showHint);
-chipBtn.addEventListener("click", showChip);
-closeRulesBtn.addEventListener("click", ()=>{ rulesModal.style.display = "none"; localStorage.setItem(RULES_KEY,"1"); });
-
-// initialize app
+// --- bootstrap ---
 (function init(){
-  showRulesIfNeeded();
-  const t = pickInitialTheme();
-  setTheme(t);
-  buildAdminDropdown();
+  showIntroIfNeeded();
+  // default pick
+  const pick = THEMES[Math.floor(Math.random()*THEMES.length)];
+  applyTheme(pick);
+  wireEvents();
+  setupAdmin();
 })();
+
 
 
 
