@@ -1,121 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EchoGuess — Daily Theme Challenge (Mockup)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EchoGuess</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Intro / How-to Modal (shows once per new visitor) -->
-  <div id="introModal" class="modal" aria-hidden="true">
-    <div class="modal-card">
-      <h2>Welcome to EchoGuess</h2>
-      <p class="muted">A daily themed puzzle — decode the hidden word using three kinds of clues:</p>
-      <ol>
-        <li>Fragmented image (visual)</li>
-        <li>Short sound bite (audio)</li>
-        <li>A historical / contextual hint (text)</li>
-      </ol>
-      <p>Guess after any clue. Earlier correct answers score higher. Good luck!</p>
-      <div class="modal-actions">
-        <button id="closeIntro" class="btn primary">Start</button>
-      </div>
-    </div>
-  </div>
-
   <div class="app">
-    <header class="app-header">
-      <div>
-        <div id="brand">EchoGuess</div>
-        <div class="meta">Decode the day's theme — 3 clues • 1 word</div>
-      </div>
-      <div class="controls">
-        <button id="adminKey" class="icon-btn" title="Admin">🔑</button>
-      </div>
+    <header>
+      <h1 id="themeName">Loading Theme...</h1>
+      <div id="adminKey" title="Admin Key">🔑</div>
     </header>
 
-    <div id="themeBanner" class="theme-banner">
-      <div id="themeTitle" class="theme-title">Loading theme…</div>
-      <div id="themeSubtitle" class="theme-sub">Daily challenge</div>
-    </div>
+    <main class="center">
+      <div id="hintBox"></div>
 
-    <main class="main-grid">
-      <!-- Left: visual fragment + audio -->
-      <section class="clue-col">
-        <div class="card">
-          <div class="card-title">Visual Fragment</div>
-          <div id="visualFragment" class="visual-fragment" aria-hidden="false"></div>
-          <div class="muted small">This image starts vague and becomes clearer with each clue reveal.</div>
-        </div>
+      <div class="attr-inputs">
+        <input id="attrInput" type="text" placeholder="Enter a word..." autocomplete="off">
+        <button id="attrBtn" class="btn">Guess</button>
+        <button id="hintBtn" class="btn secondary">Get Hint</button>
+      </div>
 
-        <div class="card">
-          <div class="card-title">Sound Bite</div>
-          <div class="sound-controls">
-            <button id="playSound" class="btn">Play sound</button>
-            <button id="replaySound" class="btn secondary">Replay</button>
-          </div>
-          <div class="muted small">A short tone or jingle related to the theme.</div>
-        </div>
-      </section>
+      <div id="hintText" class="hint-text"></div>
+      <div id="history" class="history"></div>
 
-      <!-- Center: clues, guesses, history -->
-      <section class="center-col">
-        <div class="card">
-          <div class="card-title">Clues</div>
-          <div id="clueStack" class="clue-stack">
-            <!-- Clues appear here progressively -->
-          </div>
+      <div class="final-guess" id="finalArea" style="display:none">
+        <input id="finalInput" type="text" placeholder="Guess the hidden word">
+        <button id="finalBtn" class="btn secondary">Submit Guess</button>
+      </div>
 
-          <div class="guess-row">
-            <input id="guessInput" class="text-input" placeholder="Type your guess and press Enter" autocomplete="off">
-            <button id="guessBtn" class="btn">Guess</button>
-          </div>
-          <div id="invalidMsg" class="invalid-msg" role="alert" aria-live="polite"></div>
-
-          <div id="history" class="history"></div>
-
-          <div id="finalBlock" class="final-block" style="display:none">
-            <input id="finalInput" class="text-input" placeholder="Final guess the word">
-            <button id="finalBtn" class="btn secondary">Final</button>
-          </div>
-
-          <div id="feedback" class="feedback" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <!-- Right: status & mascot -->
-      <aside class="status-col">
-        <div class="card status-card">
-          <div class="status-row"><div>Clues used</div><div id="cluesUsed">0 / 3</div></div>
-          <div class="status-row"><div>Final guesses</div><div id="finalsLeft">2</div></div>
-          <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
-        </div>
-
-        <div class="card mascot-card">
-          <div class="mascot">
-            <div id="chipEmoji" class="chip-emoji">🐶</div>
-            <div id="chipBubble" class="chip-bubble">I like socks 🧦</div>
-          </div>
-          <button id="chipBtn" class="btn">Press Me — Chip</button>
-        </div>
-
-        <div id="adminPanel" class="card admin-panel hidden">
-          <div class="card-title">Admin</div>
-          <label for="themeSelect">Pick theme</label>
-          <select id="themeSelect"></select>
-          <div style="margin-top:8px">
-            <button id="applyTheme" class="btn">Apply</button>
-          </div>
-        </div>
-      </aside>
+      <div class="feedback" id="feedback"></div>
     </main>
 
-    <footer class="footer">Produced by the greatest game player of all time</footer>
+    <aside class="right">
+      <div class="mascot" id="mascot">
+        🐶
+        <div id="chipSpeech" class="speech hidden">I like socks 🧦</div>
+      </div>
+      <button id="chipBtn" class="btn">Talk to Chip</button>
+    </aside>
+
+    <footer>
+      <div class="producer">Produced by the greatest game player of all time</div>
+    </footer>
   </div>
 
-  <script src="script.js" defer></script>
+  <!-- Popup -->
+  <div id="rulesPopup" class="popup">
+    <div class="popup-content">
+      <h2>Welcome to EchoGuess!</h2>
+      <p>🧩 Guess words related to the theme to uncover the hidden word.</p>
+      <p>💡 Use hints wisely — they’ll help you get closer.</p>
+      <p>🎯 You have 5 guesses for attributes, then 2 final guesses!</p>
+      <button id="startBtn" class="btn">Start Game</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
 
