@@ -1,63 +1,75 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EchoGuess</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EchoGuess — National Parks Mock</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1 id="themeName">Loading Theme...</h1>
-      <div id="adminKey" title="Admin Key">🔑</div>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">EchoGuess</div>
+      <div class="subtitle">Daily: U.S. National Parks — 3 clues, 3 attempts</div>
     </header>
 
-    <main class="center">
-      <div id="hintBox"></div>
-
-      <div class="attr-inputs">
-        <input id="attrInput" type="text" placeholder="Enter a word..." autocomplete="off">
-        <button id="attrBtn" class="btn">Guess</button>
-        <button id="hintBtn" class="btn secondary">Get Hint</button>
+    <main class="card">
+      <div class="game-head">
+        <div class="theme-label">Theme</div>
+        <h1 id="themeName">National Parks</h1>
+        <div id="status" class="status">Attempts left: <span id="attemptsLeft">3</span></div>
       </div>
 
-      <div id="hintText" class="hint-text"></div>
-      <div id="history" class="history"></div>
+      <section class="clues-grid">
+        <div class="clue-block">
+          <div class="clue-title">Clue — Quick Hint</div>
+          <div id="clueHint" class="clue-body muted">Loading clue…</div>
+        </div>
 
-      <div class="final-guess" id="finalArea" style="display:none">
-        <input id="finalInput" type="text" placeholder="Guess the hidden word">
-        <button id="finalBtn" class="btn secondary">Submit Guess</button>
-      </div>
+        <div class="clue-block">
+          <div class="clue-title">Clue — History / Fact</div>
+          <div id="clueFact" class="clue-body"></div>
+        </div>
 
-      <div class="feedback" id="feedback"></div>
+        <div class="clue-block">
+          <div class="clue-title">Clue — Sound</div>
+          <div class="clue-body">
+            <div class="sound-row">
+              <button id="playSound" class="btn">Play sound</button>
+              <div class="muted small">(short evocative tone)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="visual-card">
+        <div id="visualSVG" class="visual"></div>
+      </section>
+
+      <section class="play-area">
+        <div class="input-row">
+          <input id="guessInput" type="text" placeholder="Type your guess (single word) — press Enter" autocomplete="off" />
+          <button id="guessBtn" class="btn">Guess</button>
+        </div>
+        <div id="invalidMsg" class="invalid"> </div>
+
+        <div id="result" class="result muted"></div>
+
+        <div id="history" class="history"></div>
+
+        <div class="final-row">
+          <button id="revealBtn" class="ghost">Reveal answer (end round)</button>
+        </div>
+      </section>
     </main>
 
-    <aside class="right">
-      <div class="mascot" id="mascot">
-        🐶
-        <div id="chipSpeech" class="speech hidden">I like socks 🧦</div>
-      </div>
-      <button id="chipBtn" class="btn">Talk to Chip</button>
-    </aside>
-
-    <footer>
+    <footer class="footer">
       <div class="producer">Produced by the greatest game player of all time</div>
     </footer>
   </div>
 
-  <!-- Popup -->
-  <div id="rulesPopup" class="popup">
-    <div class="popup-content">
-      <h2>Welcome to EchoGuess!</h2>
-      <p>🧩 Guess words related to the theme to uncover the hidden word.</p>
-      <p>💡 Use hints wisely — they’ll help you get closer.</p>
-      <p>🎯 You have 5 guesses for attributes, then 2 final guesses!</p>
-      <button id="startBtn" class="btn">Start Game</button>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
+
 
