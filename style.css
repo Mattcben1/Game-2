@@ -1,83 +1,62 @@
+/* EchoGuess — classy National Parks mock styling */
 :root{
-  --bg: #eaf0ea;
-  --card: #fcfdf5;
-  --muted: #586069;
-  --accent: #276749;
-  --accent2: #38a169;
-  --danger: #d64545;
-  --glass: rgba(255,255,255,0.85);
+  --bg: #f3f7f4;
+  --card: #ffffff;
+  --muted: #54646a;
+  --accent: #2e6b3b;
+  --accent2: #7bbf6b;
+  --danger: #c53030;
   --radius: 12px;
-  --shadow: 0 8px 24px rgba(6,10,8,0.08);
+  --shadow: 0 10px 30px rgba(11,18,12,0.08);
+  --glass: rgba(255,255,255,0.85);
 }
 
-/* reset & base */
+/* reset */
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;}
-.app{max-width:980px;margin:22px auto;padding:18px;background:var(--card);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px}
-.app-header{display:flex;justify-content:space-between;align-items:center}
-.left-head{display:flex;flex-direction:column}
-#brandBadge{font-size:18px;font-weight:800;color:var(--accent);letter-spacing:0.6px}
-.meta{font-size:12px;color:var(--muted)}
-.icon-btn{background:none;border:none;font-size:20px;cursor:pointer}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#eef7ee);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#0f1f1a}
+.shell{max-width:980px;margin:28px auto;padding:14px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.brand{font-weight:800;color:var(--accent);font-size:20px}
+.subtitle{color:var(--muted);font-size:13px}
 
-/* theme banner */
-.theme-banner{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px}
-.theme-name{font-size:22px;font-weight:800;color:var(--accent);text-shadow:0 1px 2px rgba(0,0,0,0.06)}
-.theme-badge{height:8px;width:96px;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:var(--shadow);display:grid;grid-template-columns:1fr;gap:16px}
+.game-head{text-align:center}
+.theme-label{font-size:13px;color:var(--muted);letter-spacing:0.6px}
+h1{margin:6px 0 4px;color:var(--accent);font-size:28px}
+.status{font-size:13px;color:var(--muted)}
 
-/* layout */
-.layout{display:flex;gap:18px}
-.center-col{flex:2}
-.right-col{flex:1;display:flex;flex-direction:column;gap:14px}
+.clues-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.clue-block{background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
+.clue-title{font-weight:700;color:var(--accent);font-size:13px;margin-bottom:8px}
+.clue-body{font-size:15px;color:#123123;min-height:48px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
 
-/* hints, inputs */
-.hint-block{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:8px}
-.btn{background:var(--accent2);color:white;border:none;padding:9px 12px;border-radius:8px;cursor:pointer;font-weight:700}
-.btn.secondary{background:#2b6a50}
-.text-input{width:100%;padding:10px;border-radius:8px;border:1px solid #e9eef2}
-.guess-row{display:flex;gap:10px;align-items:center;margin-bottom:6px}
-.invalid-msg{color:var(--danger);font-size:13px;min-height:18px;margin-bottom:6px}
+.visual-card{display:flex;justify-content:center;align-items:center;padding:8px;margin-top:4px}
+.visual{width:100%;max-width:700px;height:220px;border-radius:10px;border:1px solid rgba(0,0,0,0.04);overflow:hidden;background:linear-gradient(180deg,#f8fff6,#eefbf0);display:flex;align-items:center;justify-content:center}
 
-/* history */
-.history{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.history-item{display:flex;justify-content:space-between;align-items:center;background:rgba(240,253,244,0.95);padding:8px 12px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
-.history-item .score{font-weight:800;color:var(--muted)}
+.play-area{padding:6px 2px}
+.input-row{display:flex;gap:10px;align-items:center}
+.input-row input{flex:1;padding:12px;border-radius:10px;border:1px solid #e7efe8;font-size:15px}
+.btn{background:var(--accent2);color:white;border:none;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:hover{opacity:0.95}
+.invalid{color:var(--danger);min-height:20px;margin-top:8px;font-size:13px}
+.result{margin-top:10px;font-weight:700;font-size:15px}
+.history{margin-top:10px;display:flex;flex-direction:column;gap:8px;max-height:160px;overflow:auto}
+.history .row{display:flex;justify-content:space-between;background:#f6fff7;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.03)}
 
-/* final area & feedback */
-.final-area{display:flex;gap:8px;margin-top:12px}
-.feedback{margin-top:12px;color:var(--muted);min-height:22px}
+.final-row{display:flex;justify-content:flex-end;margin-top:10px}
+.ghost{background:transparent;border:none;color:var(--muted);cursor:pointer;text-decoration:underline}
+.footer{text-align:center;margin-top:14px;color:var(--muted);font-size:13px}
 
-/* right column */
-.status-card{background:var(--glass);padding:12px;border-radius:12px;border:1px solid rgba(0,0,0,0.03)}
-.status-row{display:flex;justify-content:space-between;padding:6px 0;color:var(--muted)}
-.progress-wrap{height:10px;background:#e6f3e9;border-radius:999px;overflow:hidden;margin-top:6px}
-.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width 400ms ease}
-
-/* mascot */
-.mascot-card, .mascot{display:flex;flex-direction:column;align-items:center}
-.chip{position:relative;display:inline-block}
-.chip-emoji{font-size:42px}
-.chip-bubble{position:absolute;top:-46px;left:50%;transform:translateX(-50%);background:var(--accent2);color:white;padding:6px 10px;border-radius:10px;display:none;font-weight:700;box-shadow:0 6px 14px rgba(0,0,0,0.12)}
-@keyframes bubbleIn {0%{opacity:0;transform:translate(-50%,-10px)}30%{opacity:1;transform:translate(-50%,0)}90%{opacity:1}100%{opacity:0}}
-.chip-bubble.show{display:block;animation:bubbleIn 2s forwards}
-
-/* admin dropdown */
-.admin-dropdown{display:none;flex-direction:column;gap:8px;padding:10px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.04)}
-
-/* rules modal */
-.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(6,10,8,0.45);z-index:9999}
-.modal-card{background:white;padding:20px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 10px 40px rgba(0,0,0,0.2);text-align:left}
-.modal-card h2{margin-top:0}
-.rules-list{margin:8px 0 14px 18px;color:#333}
-.muted{color:var(--muted);font-size:13px}
-
-/* small screens */
-@media (max-width:860px){
-  .layout{flex-direction:column}
-  .right-col{order:2}
+/* responsive */
+@media (max-width:880px){
+  .clues-grid{grid-template-columns:1fr;gap:10px}
+  .visual{height:160px}
 }
 
 }
+
 
 
 
