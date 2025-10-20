@@ -1,318 +1,424 @@
-// ------------- Theme-Me main script -------------
-const ADMIN_PIN = "1234";
-const RULES_KEY = "themeMe_seenRules_v1";
+/* EchoGuess — National Parks mock (revamp2)
+   - single theme: US National Parks mock run
+   - each round: 3 clues (hint, history/fact+visual, sound), user gets 3 attempts
+   - invalid guesses (not in allowed list) show red message and do NOT consume attempts
+   - audio is generated via WebAudio (evocative short snippet)
+*/
 
-// DOM
-const rulesModal = document.getElementById("rulesModal");
-const closeRulesBtn = document.getElementById("closeRules");
-const themeNameEl = document.getElementById("themeName");
-const themeBanner = document.getElementById("themeBanner");
-const hintBtn = document.getElementById("hintBtn");
-const hintText = document.getElementById("hintText");
-const attrInput = document.getElementById("attrInput");
-const attrBtn = document.getElementById("attrBtn");
-const invalidMsg = document.getElementById("invalidMsg");
-const historyEl = document.getElementById("history");
-const finalArea = document.getElementById("finalArea");
-const finalInput = document.getElementById("finalInput");
-const finalBtn = document.getElementById("finalBtn");
-const feedbackEl = document.getElementById("feedback");
-const attrsLeftEl = document.getElementById("attrsLeft");
-const finalLeftEl = document.getElementById("finalLeft");
-const progressBar = document.getElementById("progressBar");
-const chipBtn = document.getElementById("chipBtn");
-const chipBubble = document.getElementById("chipBubble");
-const adminKey = document.getElementById("adminKey");
-const adminDropdown = document.getElementById("adminDropdown");
-
-// STATE
-let THEMES = [
-  // ------------- National Parks (≈160 words) -------------
+/* ----------------- DATA: curated entries (sample set) -----------------
+   Each entry includes:
+    - word: the target (single-word, lowercase)
+    - hint: short thematic hint (distinct style)
+    - fact: a short historical/contextual fact
+    - soundSeed: small array of frequencies for WebAudio synthesis (evocative)
+    - svg: an inline SVG string to show as "picture"
+   (This mock contains a curated set of parks/terms — can be extended)
+------------------------------------------------------------------------ */
+const ENTRIES = [
   {
-    name: "National Parks",
-    hint: "Think iconic U.S. parks, features, trails and wildlife",
-    targetWord: "yellowstone",
-    palette: { accent: "#2e6b3b", accent2: "#7bbf6b", bg: "#ecf8ee" },
-    words: [
-      "yellowstone","yosemite","zion","grandcanyon","sequoia","glacier","rocky","everglades","acadia","denali","joshua","arches",
-      "bryce","badlands","mesa","hiking","trail","summit","campground","ranger","geyser","hotpot","geyserbasin","mammoth",
-      "obsidian","meadow","waterfall","valley","halfdome","elcapitan","redwood","timberline","wildflower","grove","oldfaithful",
-      "caldera","canyon","cliff","overlook","vista","river","creek","lake","island","coast","sandstone","butte","plateau","buttearch",
-      "bison","bear","elk","moose","wolf","mountain","cabin","camp","trailhead","switchback","snowcap","glacierlake","ridge","plateau",
-      "petrified","dunes","sandhill","estuary","saltmarsh","fen","springs","mudpots","sulfur","hikingboot","backpack","scenicdrive",
-      "visitorcenter","lookout","trailmarker","canoe","kayak","delta","cairn","granite","basalt","limestone","karst","cave","stalactite",
-      "stalagmite","fossil","prairie","grassland","slope","pine","fir","spruce","juniper","sagebrush","prairiedog","pronghorn","antelope",
-      "rapids","whitewater","raft","campsite","picnic","heritage","monument","preserve","sanctuary","wilderness","concession","trailmap",
-      "rangerstation","entrance","parkway","lookoutpoint","rockfall","avalanche","birdwatch","eagle","falcon","owlet","sunrise","sunset",
-      "stargaze","darksky","dayhike","overnight","permit","backcountry","snowshoe","iceaxe","bridge","boardwalk","coquina","seagrass",
-      "sandbar","cliffside","lagoon","estuaries","marsh","saltflat","lavafield","lavaflow","lava tube","lava dome","basaltcolumn","geyserite",
-      "hydrothermal","sinter","geyserpool","thermal","hot spring","fumarole","mud volcano","boiling","mammothhot"
-    ]
+    word: "yellowstone",
+    hint: "Geothermal wonders & roaming megafauna.",
+    fact: "Designated in 1872 as the world's first national park — famous for geysers and hot springs.",
+    soundSeed: [220, 330, 440],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <rect width="100%" height="100%" fill="#f6fff6"/>
+        <g transform="translate(40,20)">
+          <ellipse cx="220" cy="280" rx="200" ry="28" fill="#dff0d9"/>
+          <path d="M180 200 Q220 120 260 200 Q300 260 340 200" fill="#fff7e7" stroke="#ffd2a6" stroke-width="6" />
+          <text x="10" y="340" font-size="18" fill="#2b6b36">Yellowstone — geyser basins</text>
+        </g>
+      </svg>
+    `)
   },
-
-  // ------------- Mountain Gear (≈160 words) -------------
   {
-    name: "Mountain Gear",
-    hint: "Tools, clothing and equipment for alpine travel and climbing",
-    targetWord: "crampon",
-    palette: { accent: "#2b3a49", accent2: "#748199", bg: "#f3f6f8" },
-    words: [
-      "crampon","iceaxe","harness","carabiner","quickdraw","rope","belay","prusik","helmet","chalkbag","piton","bolt","anchor","slab",
-      "overhang","trad","sport","boulder","bouldering","cam","nut","hex","sling","webbing","ascender","descender","figureeight","prusikloop",
-      "icehammer","icepiton","gaiters","mountaineeringboot","approachshoe","hardshell","softshell","insulation","puffy","downjacket","fleece",
-      "baseLayer","midlayer","merino","gloves","mittens","balaclava","beanie","sunglasses","goggles","headlamp","stove","canister","fuel",
-      "cookpot","spork","thermos","hydration","pack","backpack","packframe","hipbelt","compressionstrap","trekkingpole","ropebag","haulbag",
-      "portaledge","pitonhammer","tape","route","pitch","anchorstation","belaystation","rappel","abseil","scramble","ridge","summit","basecamp",
-      "glacier","crevasse","snowbridge","serac","arete","col","cairn","approach","viaferrata","bivy","bivouac","sleepingbag","inflatablepad",
-      "foamPad","drybag","map","compass","gps","altimeter","waterproof","breathable","seams","reinforced","toe rand","lace","sole","vibram",
-      "heelhook","toehook","slinganchor","nuttool","bolthanger","toprope","lead","screamer","cordalette","dyneema","spectra","oxford","nylon",
-      "carryingharness","haul","anchorbend","bowline","figure8","prusikminding","gri-gri","ascenderdevice","ice-screw","snowshoes","ski",
-      "skins","avalanche","transceiver","probe","shovel","ski-touring","skintrack","sled","sledpack","guidebook","routebook"
-    ]
+    word: "yosemite",
+    hint: "Granite monoliths & ancient sequoias.",
+    fact: "Yosemite's Half Dome and El Capitan are iconic granite formations that draw climbers worldwide.",
+    soundSeed: [130, 196, 261],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f6fff6"/>
+        <path d="M40 300 L140 120 L260 240 L380 80 L520 300" fill="none" stroke="#6aa56a" stroke-width="12" stroke-linecap="round"/>
+        <text x="12" y="340" font-size="18" fill="#2b6b36">Yosemite — granite cliffs</text>
+      </svg>
+    `)
   },
-
-  // ------------- Coffee Drinks (≈160 words) -------------
   {
-    name: "Coffee Drinks",
-    hint: "Beverages, brewing, beans, roasts and café terms",
-    targetWord: "cappuccino",
-    palette: { accent: "#6b4a2a", accent2: "#c79a6a", bg: "#fbf6f1" },
-    words: [
-      "espresso","americano","latte","cappuccino","macchiato","mocha","flatwhite","cortado","ristretto","longshot","breve","affogato",
-      "pour-over","frenchpress","aeropress","coldbrew","nitro","drip","chemex","v60","siphon","roast","lightroast","mediumroast","darkroast",
-      "blonde","singleorigin","blend","arabica","robusta","bean","greenbean","roaster","barista","steamwand","froth","microfoam","crema",
-      "tamping","tamper","portafilter","grouphead","grinder","burr","grindsize","coarse","medium","fine","dose","extraction","preinfusion",
-      "brewratio","watertemp","brewtime","channeling","tampingpressure","milk","steamedmilk","latteart","syrup","vanilla","caramel","hazelnut",
-      "shot","double","single","milksteamed","skim","oatmilk","almondmilk","soymilk","fullcream","cup","mug","demitasse","porcelain","papercup",
-      "takeaway","brightness","body","finish","aftertaste","notes","floral","chocolate","nutty","fruity","citrus","berry","caramelized",
-      "toasty","smoky","fermentation","washed","natural","honey","processing","mill","farm","altitude","shadegrown","blendhouse","brewbar",
-      "steam","pressure","9bar","pump","cupsize","tampingmat","knockbox","shotglass","portafilterbasket","filter","paperfilter","siphonfilter",
-      "espresso machine","steamsteam","pouroverstand","gooseneck","scale","timer","cupwarmer","baristahat","roastery","cupping","cuppingform"
-    ]
+    word: "grandcanyon",
+    hint: "A vast chasm carved by time and a river.",
+    fact: "The Colorado River cut through layers of rock to form the Grand Canyon over millions of years.",
+    soundSeed: [98, 130, 164],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fff7f2"/>
+        <path d="M0 260 L80 160 L160 220 L240 140 L320 240 L400 130 L480 220 L600 150" stroke="#c65b3b" stroke-width="18" fill="none"/>
+        <text x="10" y="340" font-size="16" fill="#7a3d2b">Grand Canyon — layered strata</text>
+      </svg>
+    `)
   },
-
-  // ------------- Classic Rock Bands (≈150 words) -------------
   {
-    name: "Classic Rock Bands",
-    hint: "Legendary bands, guitar heroes, amps, classics and album lore",
-    targetWord: "ledzeppelin",
-    palette: { accent: "#581717", accent2: "#d04b4b", bg: "#fff7f7" },
-    words: [
-      "ledzeppelin","rollingstones","thewho","pinkfloyd","fleetwoodmac","thebeatles","aerosmith","acdc","queen","eagles","creedence",
-      "tompetty","u2","vanhalen","deep purple","black sabbath","jimi hendrix","jimihendrix","gilmour","waters","plant","page","bonham",
-      "guitar","bass","drums","leadguitar","rhythm","solo","riff","powerchord","amp","marshall","fender","gibson","stratocaster","lespaul",
-      "humbucker","overdrive","wah","phaser","chorus","delay","reverb","album","vinyl","LP","single","bside","track","setlist","encore",
-      "tour","arena","stadium","roadie","soundcheck","mixing","mastering","producer","engineer","drumkit","cymbal","hi-hat","snare",
-      "bassdrum","pedalboard","amphead","cabinet","microphone","vocal","harmonica","slideguitar","bottleneck","sitar","organ","keyboard",
-      "piano","synth","moog","rhodes","verse","chorus","bridge","hook","anthem","ballad","bluesrock","psych","prog","hardrock","softrock",
-      "punk","hairmetal","stadiumrock","tribute","cover","remaster","boxset","bootleg","demo","session","soundtrack","biopic","liner",
-      "notes","albumart","poster","roadcase","tourbus","merch","t-shirt","backline","soundman","monitor","mix"
-    ]
+    word: "zion",
+    hint: "Steep red cliffs and narrow slot hikes.",
+    fact: "Zion's canyon walls rise dramatically and are cut by the Virgin River; Angels Landing is a famed viewpoint.",
+    soundSeed: [196, 246, 294],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fff7f7"/>
+        <rect x="40" y="80" width="140" height="220" fill="#f2b8a0" rx="8"/>
+        <rect x="220" y="30" width="120" height="270" fill="#e68a6a" rx="8"/>
+        <rect x="380" y="100" width="160" height="180" fill="#d86a46" rx="8"/>
+        <text x="12" y="340" font-size="16" fill="#7a3d2b">Zion — red cliffs</text>
+      </svg>
+    `)
+  },
+  {
+    word: "glacier",
+    hint: "Ice-carved valleys and cold, slow rivers of ice.",
+    fact: "Glacier National Park preserves nearly one million acres of rugged mountains and advancing/retreating glaciers.",
+    soundSeed: [150, 180, 220],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f2fbff"/>
+        <path d="M40 260 Q160 120 280 220 T520 220" fill="#d9f0ff"/>
+        <text x="12" y="340" font-size="16" fill="#1f6f8f">Glacier — ice valleys</text>
+      </svg>
+    `)
+  },
+  {
+    word: "everglades",
+    hint: "A watery subtropical mosaic full of life.",
+    fact: "The Everglades are a unique wetland ecosystem home to alligators, wading birds, and mangroves.",
+    soundSeed: [220, 170, 140],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f6fff8"/>
+        <ellipse cx="300" cy="200" rx="220" ry="80" fill="#cfeedd"/>
+        <text x="12" y="340" font-size="16" fill="#2b6b36">Everglades — wetlands & mangroves</text>
+      </svg>
+    `)
+  },
+  {
+    word: "denali",
+    hint: "Tallest peak in North America.",
+    fact: "Denali (formerly Mount McKinley) rises over 20,000 feet and dominates Alaska's interior.",
+    soundSeed: [120, 160, 200],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f6fbff"/>
+        <path d="M40 300 L180 120 L300 220 L420 80 L560 300" stroke="#7b8da0" stroke-width="12" fill="#f4f7fb"/>
+        <text x="12" y="340" font-size="16" fill="#27465a">Denali — high peak</text>
+      </svg>
+    `)
+  },
+  {
+    word: "acadia",
+    hint: "Coastal cliffs and rocky shorelines.",
+    fact: "Located on Maine's rugged coast, Acadia combines ocean vistas with forested hills.",
+    soundSeed: [262, 196, 164],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fffefb"/>
+        <path d="M0 260 L80 220 L160 240 L240 200 L320 250 L400 210 L480 240 L600 200" fill="#cfe7ff"/>
+        <text x="12" y="340" font-size="16" fill="#2b6b36">Acadia — coastal cliffs</text>
+      </svg>
+    `)
+  },
+  {
+    word: "arches",
+    hint: "Iconic sandstone arches & fins.",
+    fact: "Arches National Park preserves more than 2,000 natural sandstone arches formed by erosion.",
+    soundSeed: [330, 392, 440],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fffaf4"/>
+        <path d="M80 250 Q160 160 240 250" stroke="#e07a48" stroke-width="18" fill="none"/>
+        <path d="M300 250 Q380 140 460 250" stroke="#e07a48" stroke-width="18" fill="none"/>
+        <text x="12" y="340" font-size="16" fill="#8a3a20">Arches — sandstone arches</text>
+      </svg>
+    `)
+  },
+  {
+    word: "bryce",
+    hint: "Hoodoos—tall, thin rock spires in amphitheaters.",
+    fact: "Bryce Canyon's amphitheaters display colorful hoodoos formed by ice and frost weathering.",
+    soundSeed: [196, 233, 277],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fff9f8"/>
+        <g fill="#f1a07a">
+          <rect x="40" y="200" width="30" height="80" rx="8"/>
+          <rect x="90" y="180" width="30" height="100" rx="8"/>
+          <rect x="140" y="160" width="30" height="120" rx="8"/>
+          <rect x="190" y="170" width="30" height="110" rx="8"/>
+        </g>
+        <text x="12" y="340" font-size="14" fill="#7a3d2b">Bryce — hoodoos</text>
+      </svg>
+    `)
+  },
+  {
+    word: "sequoia",
+    hint: "Some of the planet's largest trees.",
+    fact: "Giant sequoias tower to immense heights; the General Sherman tree is among the largest by volume.",
+    soundSeed: [196, 164, 130],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f6fff6"/>
+        <rect x="120" y="40" width="40" height="260" fill="#6b4a2a" rx="8"/>
+        <ellipse cx="140" cy="60" rx="80" ry="30" fill="#7fb974"/>
+        <text x="12" y="340" font-size="14" fill="#2b6b36">Sequoia — giant trees</text>
+      </svg>
+    `)
+  },
+  {
+    word: "badlands",
+    hint: "Eroded clay buttes and rugged badland terrain.",
+    fact: "Badlands National Park features sharply eroded buttes and fossil-rich deposits.",
+    soundSeed: [150, 180, 210],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#fffaf4"/>
+        <path d="M20 250 L100 180 L180 230 L260 150 L340 220 L420 160 L500 240" stroke="#c9b098" stroke-width="14" fill="none"/>
+        <text x="12" y="340" font-size="14" fill="#7a5a3b">Badlands — eroded buttes</text>
+      </svg>
+    `)
+  },
+  {
+    word: "everglades",
+    hint: "A slow-moving 'river of grass'.",
+    fact: "Called the 'river of grass', Everglades are a vast network of wetlands and mangrove ecosystems.",
+    soundSeed: [220, 180, 160],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f7fff9"/>
+        <ellipse cx="300" cy="200" rx="220" ry="80" fill="#cfeedd"/>
+        <text x="12" y="340" font-size="16" fill="#2b6b36">Everglades — wetlands</text>
+      </svg>
+    `)
+  },
+  {
+    word: "rocky",
+    hint: "Alpine peaks, tundra and long trails.",
+    fact: "Rocky Mountain National Park spans high alpine terrain and supports diverse wildlife from elk to pikas.",
+    soundSeed: [164, 196, 220],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f6fbff"/>
+        <path d="M40 280 L120 160 L220 240 L340 120 L540 300" stroke="#6b8da1" stroke-width="12" fill="none"/>
+        <text x="12" y="340" font-size="16" fill="#27465a">Rocky — alpine peaks</text>
+      </svg>
+    `)
+  },
+  {
+    word: "olympic",
+    hint: "Rainforests, mountains and a wild coastline.",
+    fact: "Olympic National Park protects diverse ecosystems from temperate rainforest to glaciated mountains and Pacific beaches.",
+    soundSeed: [180, 210, 240],
+    svg: (`
+      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#f6fff9"/>
+        <path d="M20 250 Q120 120 220 220 T520 200" fill="#d9f0ff"/>
+        <text x="12" y="340" font-size="16" fill="#2b6b36">Olympic — rainforest & coast</text>
+      </svg>
+    `)
   }
+  // (You can add many more entries. This prototype has a representative set.)
 ];
 
-let currentTheme = null;
-let targetWord = "";
-let attrsLeft = 5;
-let finalsLeft = 2;
-let guessScores = {};   // store computed scores for consistency
-let historyList = [];   // {word,score}
+/* ----------------- state ----------------- */
+let chosen = null;         // chosen entry for the round
+let attemptsLeft = 3;
+let history = [];          // guessed words with correct boolean
+let audioCtx = null;
 
-// Several helper utilities
-function applyPalette(p){
-  if(!p) return;
-  document.documentElement.style.setProperty("--accent", p.accent);
-  document.documentElement.style.setProperty("--accent2", p.accent2);
-  document.documentElement.style.setProperty("--bg", p.bg);
-  // update banner quickly
-  const banner = document.getElementById("themeBanner");
-  if(banner) banner.style.background = "transparent";
+/* ----------------- DOM refs ----------------- */
+const themeNameEl = document.getElementById("themeName");
+const attemptsLeftEl = document.getElementById("attemptsLeft");
+const clueHintEl = document.getElementById("clueHint");
+const clueFactEl = document.getElementById("clueFact");
+const visualEl = document.getElementById("visualSVG") || document.getElementById("visualSVG");
+const playSoundBtn = document.getElementById("playSound");
+const guessInput = document.getElementById("guessInput");
+const guessBtn = document.getElementById("guessBtn");
+const invalidMsgEl = document.getElementById("invalidMsg");
+const resultEl = document.getElementById("result");
+const historyEl = document.getElementById("history");
+const revealBtn = document.getElementById("revealBtn");
+
+/* ----------------- helpers ----------------- */
+function pickEntryRandom(){
+  return ENTRIES[Math.floor(Math.random() * ENTRIES.length)];
 }
 
-function showRulesIfNeeded(){
-  const seen = localStorage.getItem(RULES_KEY);
-  if(!seen){
-    rulesModal.style.display = "flex";
-    rulesModal.setAttribute("aria-hidden","false");
-  } else {
-    rulesModal.style.display = "none";
-    rulesModal.setAttribute("aria-hidden","true");
-  }
+function setChosen(e){
+  chosen = e;
+  attemptsLeft = 3;
+  history = [];
+  attemptsLeftEl.textContent = attemptsLeft;
+  themeNameEl.textContent = "U.S. National Parks";
+  renderClues();
+  renderVisual();
+  renderHistory();
+  resultEl.textContent = "";
+  invalidMsgEl.textContent = "";
+  guessInput.value = "";
 }
 
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[ch])); }
-
-// choose initial theme (persisted or random)
-function pickInitialTheme(){
-  const saved = localStorage.getItem("themeMe_selectedTheme_v1");
-  if(saved){
-    const t = THEMES.find(x=>x.name===saved);
-    if(t) return t;
-  }
-  // pick random theme
-  return THEMES[Math.floor(Math.random()*THEMES.length)];
+function renderClues(){
+  // show the three kinds of clues (they are unrelated to each other but all point to chosen.word)
+  clueHintEl.textContent = chosen.hint;
+  clueFactEl.textContent = chosen.fact;
+  // sound hint is triggered with play button (no auto-play)
 }
 
-// set theme object
-function setTheme(theme){
-  currentTheme = (typeof theme === "string") ? THEMES.find(t=>t.name===theme) : theme;
-  if(!currentTheme) currentTheme = THEMES[0];
-  targetWord = currentTheme.targetWord.toLowerCase();
-  themeNameEl.textContent = currentTheme.name;
-  applyPalette(currentTheme.palette);
-  resetRound();
-  localStorage.setItem("themeMe_selectedTheme_v1", currentTheme.name);
-  buildAdminDropdown();
+function renderVisual(){
+  if(!visualEl) return;
+  visualEl.innerHTML = chosen.svg || "";
 }
 
-// reset round state
-function resetRound(){
-  attrsLeft = 5; finalsLeft = 2;
-  guessScores = {}; historyList = [];
-  historyEl.innerHTML = "";
-  invalidMsg.textContent = "";
-  feedbackEl.textContent = "";
-  attrInput.value = "";
-  finalInput.value = "";
-  finalArea.style.display = "none";
-  attrsLeftEl.textContent = attrsLeft;
-  finalLeftEl.textContent = finalsLeft;
-  progressBar.style.width = "0%";
+/* ----------------- audio ----------------- */
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
-
-// scoring heuristic (deterministic per round for a word)
-function scoreFor(word){
-  const w = word.toLowerCase();
-  if(guessScores[w] !== undefined) return guessScores[w];
-  const t = targetWord;
-  // letter set match
-  const aSet = new Set(w.split(''));
-  let matches = 0;
-  aSet.forEach(ch => { if(t.includes(ch)) matches++; });
-  // position match bonus
-  let pos = 0;
-  for(let i=0;i<Math.min(w.length,t.length);i++) if(w[i]===t[i]) pos++;
-  // substring bonus
-  const substr = (t.includes(w) || w.includes(t)) ? 2 : 0;
-  let base = Math.min(90, 30 + matches*8 + pos*4 + substr*6);
-  if(w === t) base = 100;
-  base = Math.max(0, Math.min(100, Math.round(base)));
-  guessScores[w] = base;
-  return base;
-}
-
-// add history item UI
-function addHistory(word,score){
-  const div = document.createElement("div");
-  div.className = "history-item";
-  div.innerHTML = `<div class="word">${escapeHtml(word)}</div><div class="score">${score}</div>`;
-  historyEl.prepend(div);
-}
-
-// handle attribute guess
-function handleAttrGuess(){
-  const val = attrInput.value.trim().toLowerCase();
-  attrInput.value = "";
-  if(!val) return;
-  if(!currentTheme.words.includes(val)){
-    invalidMsg.textContent = "Not a listed word, try again";
-    setTimeout(()=> invalidMsg.textContent = "", 1400);
-    return;
-  }
-  // if already guessed, show same score and don't consume a guess
-  if(guessScores[val] !== undefined){
-    const s = guessScores[val];
-    feedbackEl.textContent = `${val} → ${s}`;
-    return;
-  }
-  const s = scoreFor(val);
-  addHistory(val,s);
-  historyList.unshift({word:val,score:s});
-  attrsLeft--;
-  attrsLeftEl.textContent = attrsLeft;
-  const done = 5 - attrsLeft;
-  progressBar.style.width = `${Math.round((done/5)*100)}%`;
-  feedbackEl.textContent = `${val} → ${s}`;
-  if(attrsLeft <= 0) finalArea.style.display = "flex";
-}
-
-// handle final guess
-function handleFinalGuess(){
-  const val = finalInput.value.trim().toLowerCase();
-  finalInput.value = "";
-  if(!val) return;
-  finalsLeft--;
-  finalLeftEl.textContent = finalsLeft;
-  if(val === targetWord){
-    feedbackEl.textContent = `🎉 Correct! The hidden word was "${targetWord}".`;
-    finalArea.style.display = "none";
-    return;
-  } else {
-    feedbackEl.textContent = `❌ Wrong. ${finalsLeft} final guesses left.`;
-  }
-  if(finalsLeft <= 0){
-    feedbackEl.textContent = `💀 Out of tries — the word was "${targetWord}".`;
-    finalArea.style.display = "none";
-  }
-}
-
-// show hint in red
-function showHint(){
-  if(currentTheme && currentTheme.hint){
-    hintText.textContent = currentTheme.hint;
-    hintText.style.color = "red";
-  }
-}
-
-// chip bubble animation
-function showChip(){
-  chipBubble.classList.add("show");
-  setTimeout(()=> chipBubble.classList.remove("show"), 2000);
-}
-
-// admin dropdown builder
-function buildAdminDropdown(){
-  adminDropdown.innerHTML = "";
-  THEMES.forEach(t=>{
-    const b = document.createElement("button");
-    b.textContent = t.name;
-    b.className = "btn";
-    b.style.background = "#fff";
-    b.style.color = "var(--accent)";
-    b.addEventListener("click", ()=> {
-      setTheme(t.name);
-      adminDropdown.style.display = "none";
-    });
-    adminDropdown.appendChild(b);
+function playSeed(seed){
+  if(!seed || !seed.length) return;
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.connect(audioCtx.destination);
+  let t = now;
+  seed.forEach((freq, i) => {
+    const o = audioCtx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(freq, t);
+    const env = audioCtx.createGain();
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(0.12, t + 0.02);
+    env.gain.linearRampToValueAtTime(0.0001, t + 0.28);
+    o.connect(env);
+    env.connect(gain);
+    o.start(t);
+    o.stop(t + 0.32);
+    t += 0.32;
   });
 }
 
-// admin key handler
-adminKey.addEventListener("click", ()=>{
-  const pin = prompt("Enter admin PIN:");
-  if(pin === ADMIN_PIN){
-    adminDropdown.style.display = adminDropdown.style.display === "flex" ? "none" : "flex";
-  } else {
-    alert("Wrong PIN");
+/* ----------------- gameplay ----------------- */
+function guessWord(){
+  invalidMsgEl.textContent = "";
+  resultEl.textContent = "";
+  const val = (guessInput.value || "").trim().toLowerCase();
+  guessInput.value = "";
+  if(!val){
+    return;
   }
+  // only accept single-word guesses (no spaces)
+  if(/\s/.test(val)){
+    invalidMsgEl.textContent = "Please enter a single word (no spaces).";
+    return;
+  }
+  // validate the guess: check if guess is in allowed list of candidate words (words in ENTRIES)
+  const allowed = ENTRIES.map(e => e.word.toLowerCase());
+  if(!allowed.includes(val)){
+    invalidMsgEl.textContent = "Not a listed park-word — try another related word.";
+    return;
+  }
+  // if already guessed, show same result without consuming attempt
+  if(history.find(h => h.word === val)){
+    resultEl.textContent = `You've already guessed "${val}".`;
+    return;
+  }
+  // check
+  const correct = (val === chosen.word.toLowerCase());
+  history.unshift({word: val, correct});
+  renderHistory();
+  if(correct){
+    resultEl.innerHTML = `🎉 Correct — <strong>${chosen.word}</strong>! You solved it with ${attemptsLeft} attempts remaining.`;
+    endRound(true);
+    return;
+  } else {
+    attemptsLeft -= 1;
+    attemptsLeftEl.textContent = attemptsLeft;
+    if(attemptsLeft > 0){
+      resultEl.textContent = `Not quite — ${attemptsLeft} attempt${attemptsLeft===1 ? "" : "s"} left.`;
+    } else {
+      resultEl.innerHTML = `💀 Out of attempts — the word was <strong>${chosen.word}</strong>.`;
+      endRound(false);
+    }
+  }
+}
+
+function renderHistory(){
+  historyEl.innerHTML = "";
+  history.forEach(h => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<div>${escapeHtml(h.word)}</div><div>${h.correct ? '✓' : '✕'}</div>`;
+    historyEl.appendChild(row);
+  });
+}
+
+function endRound(won){
+  // reveal extra facts and lock inputs
+  revealBtn.textContent = "New round";
+  guessBtn.disabled = true;
+  guessInput.disabled = true;
+  playSoundBtn.disabled = true;
+  revealBtn.onclick = () => {
+    // start a fresh round
+    guessBtn.disabled = false;
+    guessInput.disabled = false;
+    playSoundBtn.disabled = false;
+    revealBtn.textContent = "Reveal answer (end round)";
+    setChosen(pickEntryRandom());
+  };
+}
+
+/* ----------------- utilities ----------------- */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[ch])); }
+
+/* ----------------- wire events ----------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  // pick entry and initialize
+  setChosen(pickEntryRandom());
+
+  // play sound button
+  playSoundBtn.addEventListener("click", () => {
+    try{
+      playSeed(chosen.soundSeed);
+    }catch(e){
+      console.warn(e);
+    }
+  });
+
+  // guess actions
+  guessBtn.addEventListener("click", guessWord);
+  guessInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") guessWord();
+  });
+
+  // reveal button
+  revealBtn.addEventListener("click", () => {
+    // immediate reveal (end round)
+    resultEl.innerHTML = `Answer revealed — <strong>${chosen.word}</strong>.`;
+    revealAll();
+    guessBtn.disabled = true;
+    guessInput.disabled = true;
+  });
+
+  // click-to-focus convenience
+  document.body.addEventListener("click", (e) => {
+    // small UX: if clicking background, focus input
+    if(e.target === document.body) guessInput.focus();
+  });
 });
 
-// wire UI events
-attrBtn.addEventListener("click", handleAttrGuess);
-attrInput.addEventListener("keypress", e => { if(e.key === "Enter") handleAttrGuess(); });
-finalBtn.addEventListener("click", handleFinalGuess);
-finalInput.addEventListener("keypress", e => { if(e.key === "Enter") handleFinalGuess(); });
-hintBtn.addEventListener("click", showHint);
-chipBtn.addEventListener("click", showChip);
-closeRulesBtn.addEventListener("click", ()=>{ rulesModal.style.display = "none"; localStorage.setItem(RULES_KEY,"1"); });
-
-// initialize app
-(function init(){
-  showRulesIfNeeded();
-  const t = pickInitialTheme();
-  setTheme(t);
-  buildAdminDropdown();
-})();
-
+/* reveal all facts (used on reveal) */
+function revealAll(){
+  if(chosen && chosen.fact){
+    clueFactEl.textContent = chosen.fact + " (extra detail revealed)";
+  }
+}
 
 
