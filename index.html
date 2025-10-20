@@ -3,60 +3,61 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EchoGuess — Revamp2 (National Parks)</title>
+  <title>EchoGuess — Daily (revamp2)</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <header class="top">
+  <div class="wrap">
+    <header class="site-header">
       <div class="brand">EchoGuess</div>
-      <div class="tag">Daily: U.S. National Parks — 3 clues • 3 attempts</div>
+      <div class="subtitle">Daily • U.S. National Parks</div>
     </header>
 
-    <main class="card">
-      <section class="head">
-        <h2 id="themeTitle">U.S. National Parks</h2>
-        <div class="status">Attempts left: <span id="attemptsLeft">3</span></div>
+    <main class="panel" id="panel">
+      <section class="panel-top">
+        <div class="theme-line">Theme</div>
+        <h1 id="themeTitle" class="theme-title">U.S. National Parks</h1>
+        <div class="meta">Attempts left: <span id="attemptsLeft">3</span></div>
       </section>
 
-      <section class="clues">
-        <div class="clue card-small">
+      <section class="clues-grid" aria-live="polite">
+        <div class="clue-card" id="clueCard1">
           <div class="clue-label">Clue 1 — Quick Hint</div>
-          <div id="clue1" class="clue-text muted">...</div>
+          <div id="clue1" class="clue-text muted">—</div>
         </div>
 
-        <div class="clue card-small">
+        <div class="clue-card" id="clueCard2">
           <div class="clue-label">Clue 2 — Sound (click to play)</div>
           <div class="clue-sound">
-            <button id="playSound" class="btn">▶ Play sound</button>
-            <div id="clue2" class="clue-text muted small">Locked — wait or guess to unlock</div>
+            <button id="playBtn" class="btn">▶ Play</button>
+            <div id="clue2" class="clue-text muted">—</div>
           </div>
         </div>
 
-        <div class="clue card-small">
-          <div class="clue-label">Clue 3 — History & Visual</div>
-          <div id="clue3" class="clue-text muted">Locked — wait or guess to unlock</div>
+        <div class="clue-card" id="clueCard3">
+          <div class="clue-label">Clue 3 — History</div>
+          <div id="clue3" class="clue-text muted">—</div>
         </div>
       </section>
 
-      <section class="visual card-medium" id="visualArea" aria-hidden="true">
+      <section class="visual-area card" id="visualArea" aria-hidden="true">
         <!-- SVG injected here -->
       </section>
 
-      <section class="play">
-        <div class="input-row">
-          <input id="guessInput" placeholder="Type a single-word guess (e.g. denali)" autocomplete="off" />
+      <section class="play-area">
+        <div class="guess-row">
+          <input id="guessInput" class="text-input" placeholder="Enter single-word guess (e.g. denali)" autocomplete="off" />
           <button id="guessBtn" class="btn">Guess</button>
         </div>
-        <div id="invalidMsg" class="invalid"></div>
 
-        <div id="result" class="result muted"></div>
+        <div id="invalidMsg" class="invalid" role="status" aria-live="polite"></div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
 
-        <div id="history" class="history"></div>
+        <div id="history" class="history" aria-live="polite"></div>
 
-        <div class="controls">
-          <button id="reveal" class="ghost">Reveal answer (end round)</button>
-          <button id="newRound" class="ghost hidden">New round</button>
+        <div class="actions">
+          <button id="revealBtn" class="ghost">Reveal answer (end round)</button>
+          <button id="nextBtn" class="ghost hidden">Play again (test)</button>
         </div>
       </section>
     </main>
@@ -64,13 +65,13 @@
     <footer class="footer">Produced by the greatest game player of all time</footer>
   </div>
 
-  <!-- Start modal (shows once) -->
-  <div id="startModal" class="modal" aria-hidden="false">
+  <!-- start modal (shows once, user can close) -->
+  <div id="welcomeModal" class="modal" aria-hidden="true">
     <div class="modal-card">
-      <h3>Welcome to EchoGuess</h3>
-      <p>Each round you get <strong>3 clues</strong> that relate to the hidden park word. Clues unlock over time or after incorrect guesses. You have <strong>3 attempts</strong>. Good luck — think sensory, historical, and personal.</p>
+      <h2>EchoGuess — Daily</h2>
+      <p>You get three thoughtful clues that point to today's hidden park word. You have <strong>3 attempts</strong>. Clues are sensory, historical, and evocative — think memory, place, and feeling.</p>
       <div class="modal-actions">
-        <button id="startBtn" class="btn primary">Start Game</button>
+        <button id="startBtn" class="btn primary">Start</button>
       </div>
     </div>
   </div>
