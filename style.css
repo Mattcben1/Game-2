@@ -1,120 +1,59 @@
-body {
-  font-family: "Nunito", sans-serif;
-  background: #eaf0ea;
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+/* EchoGuess — classy National Parks mock styling */
+:root{
+  --bg: #f3f7f4;
+  --card: #ffffff;
+  --muted: #54646a;
+  --accent: #2e6b3b;
+  --accent2: #7bbf6b;
+  --danger: #c53030;
+  --radius: 12px;
+  --shadow: 0 10px 30px rgba(11,18,12,0.08);
+  --glass: rgba(255,255,255,0.85);
 }
-.app {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  padding: 20px;
-  width: 90%;
-  max-width: 960px;
+
+/* reset */
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,var(--bg),#eef7ee);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;color:#0f1f1a}
+.shell{max-width:980px;margin:28px auto;padding:14px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.brand{font-weight:800;color:var(--accent);font-size:20px}
+.subtitle{color:var(--muted);font-size:13px}
+
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:var(--shadow);display:grid;grid-template-columns:1fr;gap:16px}
+.game-head{text-align:center}
+.theme-label{font-size:13px;color:var(--muted);letter-spacing:0.6px}
+h1{margin:6px 0 4px;color:var(--accent);font-size:28px}
+.status{font-size:13px;color:var(--muted)}
+
+.clues-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.clue-block{background:var(--glass);padding:12px;border-radius:10px;border:1px solid rgba(0,0,0,0.03)}
+.clue-title{font-weight:700;color:var(--accent);font-size:13px;margin-bottom:8px}
+.clue-body{font-size:15px;color:#123123;min-height:48px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+
+.visual-card{display:flex;justify-content:center;align-items:center;padding:8px;margin-top:4px}
+.visual{width:100%;max-width:700px;height:220px;border-radius:10px;border:1px solid rgba(0,0,0,0.04);overflow:hidden;background:linear-gradient(180deg,#f8fff6,#eefbf0);display:flex;align-items:center;justify-content:center}
+
+.play-area{padding:6px 2px}
+.input-row{display:flex;gap:10px;align-items:center}
+.input-row input{flex:1;padding:12px;border-radius:10px;border:1px solid #e7efe8;font-size:15px}
+.btn{background:var(--accent2);color:white;border:none;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:hover{opacity:0.95}
+.invalid{color:var(--danger);min-height:20px;margin-top:8px;font-size:13px}
+.result{margin-top:10px;font-weight:700;font-size:15px}
+.history{margin-top:10px;display:flex;flex-direction:column;gap:8px;max-height:160px;overflow:auto}
+.history .row{display:flex;justify-content:space-between;background:#f6fff7;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.03)}
+
+.final-row{display:flex;justify-content:flex-end;margin-top:10px}
+.ghost{background:transparent;border:none;color:var(--muted);cursor:pointer;text-decoration:underline}
+.footer{text-align:center;margin-top:14px;color:var(--muted);font-size:13px}
+
+/* responsive */
+@media (max-width:880px){
+  .clues-grid{grid-template-columns:1fr;gap:10px}
+  .visual{height:160px}
 }
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-h1 {
-  color: #276749;
-}
-.btn {
-  background: #38a169;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 12px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.btn.secondary {
-  background: #276749;
-}
-.btn:hover {
-  opacity: 0.85;
-}
-.center {
-  text-align: center;
-}
-.attr-inputs {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 16px 0;
-}
-.attr-inputs input {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  width: 60%;
-}
-.hint-text {
-  color: red;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-.history {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 240px;
-  overflow-y: auto;
-}
-.history-item {
-  background: #f0fdf4;
-  border-radius: 10px;
-  padding: 8px;
-  display: flex;
-  justify-content: space-between;
-}
-.feedback {
-  margin-top: 10px;
-  color: #4f4f4f;
-}
-.mascot {
-  text-align: center;
-  font-size: 42px;
-  position: relative;
-}
-.speech {
-  position: absolute;
-  top: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  border-radius: 10px;
-  padding: 8px 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-  font-size: 14px;
-}
-.hidden {
-  display: none;
-}
-.popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.popup-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  width: 90%;
-  max-width: 400px;
-}
-footer {
-  margin-top: 20px;
-  text-align: center;
-  color: #4f4f4f;
-  font-size: 14px;
-}
+
+
 
