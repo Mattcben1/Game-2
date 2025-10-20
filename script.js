@@ -1,336 +1,241 @@
-/* EchoGuess — National Parks mock (revamp2)
-   - single theme: US National Parks mock run
-   - each round: 3 clues (hint, history/fact+visual, sound), user gets 3 attempts
-   - invalid guesses (not in allowed list) show red message and do NOT consume attempts
-   - audio is generated via WebAudio (evocative short snippet)
+/* EchoGuess revamp2
+   - 3 clues (hint, sound, history/visual)
+   - clues unlock progressively: immediate / 30s or wrong guess / 30s or second wrong
+   - 3 attempts; invalid guesses don't consume attempts
+   - inline SVGs & WebAudio seeds; no external images
 */
 
-/* ----------------- DATA: curated entries (sample set) -----------------
-   Each entry includes:
-    - word: the target (single-word, lowercase)
-    - hint: short thematic hint (distinct style)
-    - fact: a short historical/contextual fact
-    - soundSeed: small array of frequencies for WebAudio synthesis (evocative)
-    - svg: an inline SVG string to show as "picture"
-   (This mock contains a curated set of parks/terms — can be extended)
------------------------------------------------------------------------- */
+/* ---------- CURATED ENTRIES (sample) ---------- 
+   Make entries more niche: sensory + cultural + specific facts.
+   You can expand this array with more parks and more "niche" clues.
+*/
 const ENTRIES = [
   {
-    word: "yellowstone",
-    hint: "Geothermal wonders & roaming megafauna.",
-    fact: "Designated in 1872 as the world's first national park — famous for geysers and hot springs.",
-    soundSeed: [220, 330, 440],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-        <rect width="100%" height="100%" fill="#f6fff6"/>
-        <g transform="translate(40,20)">
-          <ellipse cx="220" cy="280" rx="200" ry="28" fill="#dff0d9"/>
-          <path d="M180 200 Q220 120 260 200 Q300 260 340 200" fill="#fff7e7" stroke="#ffd2a6" stroke-width="6" />
-          <text x="10" y="340" font-size="18" fill="#2b6b36">Yellowstone — geyser basins</text>
-        </g>
-      </svg>
-    `)
-  },
-  {
-    word: "yosemite",
-    hint: "Granite monoliths & ancient sequoias.",
-    fact: "Yosemite's Half Dome and El Capitan are iconic granite formations that draw climbers worldwide.",
-    soundSeed: [130, 196, 261],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f6fff6"/>
-        <path d="M40 300 L140 120 L260 240 L380 80 L520 300" fill="none" stroke="#6aa56a" stroke-width="12" stroke-linecap="round"/>
-        <text x="12" y="340" font-size="18" fill="#2b6b36">Yosemite — granite cliffs</text>
-      </svg>
-    `)
-  },
-  {
-    word: "grandcanyon",
-    hint: "A vast chasm carved by time and a river.",
-    fact: "The Colorado River cut through layers of rock to form the Grand Canyon over millions of years.",
-    soundSeed: [98, 130, 164],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#fff7f2"/>
-        <path d="M0 260 L80 160 L160 220 L240 140 L320 240 L400 130 L480 220 L600 150" stroke="#c65b3b" stroke-width="18" fill="none"/>
-        <text x="10" y="340" font-size="16" fill="#7a3d2b">Grand Canyon — layered strata</text>
-      </svg>
-    `)
-  },
-  {
-    word: "zion",
-    hint: "Steep red cliffs and narrow slot hikes.",
-    fact: "Zion's canyon walls rise dramatically and are cut by the Virgin River; Angels Landing is a famed viewpoint.",
-    soundSeed: [196, 246, 294],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#fff7f7"/>
-        <rect x="40" y="80" width="140" height="220" fill="#f2b8a0" rx="8"/>
-        <rect x="220" y="30" width="120" height="270" fill="#e68a6a" rx="8"/>
-        <rect x="380" y="100" width="160" height="180" fill="#d86a46" rx="8"/>
-        <text x="12" y="340" font-size="16" fill="#7a3d2b">Zion — red cliffs</text>
-      </svg>
-    `)
-  },
-  {
-    word: "glacier",
-    hint: "Ice-carved valleys and cold, slow rivers of ice.",
-    fact: "Glacier National Park preserves nearly one million acres of rugged mountains and advancing/retreating glaciers.",
-    soundSeed: [150, 180, 220],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f2fbff"/>
-        <path d="M40 260 Q160 120 280 220 T520 220" fill="#d9f0ff"/>
-        <text x="12" y="340" font-size="16" fill="#1f6f8f">Glacier — ice valleys</text>
-      </svg>
-    `)
+    word: "denali",
+    hint: "A colossal summit that dominates Alaska's horizon.",
+    fact: "Once officially named for a U.S. president, the mountain reclaimed its indigenous name (Denali) in 2015.",
+    soundSeed: [110, 140, 165], // evocative wind-tones
+    svg: `<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#f6fbff"/>
+      <path d="M40 320 L180 120 L340 240 L480 60 L660 320" stroke="#7b8da0" stroke-width="12" fill="none"/>
+      <text x="16" y="335" font-size="16" fill="#27465a">Denali — Alaska's high peak</text>
+    </svg>`
   },
   {
     word: "everglades",
-    hint: "A watery subtropical mosaic full of life.",
-    fact: "The Everglades are a unique wetland ecosystem home to alligators, wading birds, and mangroves.",
-    soundSeed: [220, 170, 140],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f6fff8"/>
-        <ellipse cx="300" cy="200" rx="220" ry="80" fill="#cfeedd"/>
-        <text x="12" y="340" font-size="16" fill="#2b6b36">Everglades — wetlands & mangroves</text>
-      </svg>
-    `)
-  },
-  {
-    word: "denali",
-    hint: "Tallest peak in North America.",
-    fact: "Denali (formerly Mount McKinley) rises over 20,000 feet and dominates Alaska's interior.",
-    soundSeed: [120, 160, 200],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f6fbff"/>
-        <path d="M40 300 L180 120 L300 220 L420 80 L560 300" stroke="#7b8da0" stroke-width="12" fill="#f4f7fb"/>
-        <text x="12" y="340" font-size="16" fill="#27465a">Denali — high peak</text>
-      </svg>
-    `)
-  },
-  {
-    word: "acadia",
-    hint: "Coastal cliffs and rocky shorelines.",
-    fact: "Located on Maine's rugged coast, Acadia combines ocean vistas with forested hills.",
-    soundSeed: [262, 196, 164],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#fffefb"/>
-        <path d="M0 260 L80 220 L160 240 L240 200 L320 250 L400 210 L480 240 L600 200" fill="#cfe7ff"/>
-        <text x="12" y="340" font-size="16" fill="#2b6b36">Acadia — coastal cliffs</text>
-      </svg>
-    `)
-  },
-  {
-    word: "arches",
-    hint: "Iconic sandstone arches & fins.",
-    fact: "Arches National Park preserves more than 2,000 natural sandstone arches formed by erosion.",
-    soundSeed: [330, 392, 440],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#fffaf4"/>
-        <path d="M80 250 Q160 160 240 250" stroke="#e07a48" stroke-width="18" fill="none"/>
-        <path d="M300 250 Q380 140 460 250" stroke="#e07a48" stroke-width="18" fill="none"/>
-        <text x="12" y="340" font-size="16" fill="#8a3a20">Arches — sandstone arches</text>
-      </svg>
-    `)
+    hint: "A slow-moving 'river of grass' with a chorus at dawn.",
+    fact: "A subtropical wetland, home to mangroves, wading birds, and the American alligator.",
+    soundSeed: [220, 180, 140], // a watery/low chord vibe
+    svg: `<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#f7fff9"/>
+      <ellipse cx="350" cy="200" rx="260" ry="80" fill="#cfeedd"/>
+      <text x="16" y="335" font-size="16" fill="#2b6b36">Everglades — river of grass</text>
+    </svg>`
   },
   {
     word: "bryce",
-    hint: "Hoodoos—tall, thin rock spires in amphitheaters.",
-    fact: "Bryce Canyon's amphitheaters display colorful hoodoos formed by ice and frost weathering.",
+    hint: "An amphitheater of towering orange hoodoos sculpted by frost.",
+    fact: "Bryce Canyon's hoodoos formed through freeze-thaw cycles — tiny elements create huge forms over time.",
     soundSeed: [196, 233, 277],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#fff9f8"/>
-        <g fill="#f1a07a">
-          <rect x="40" y="200" width="30" height="80" rx="8"/>
-          <rect x="90" y="180" width="30" height="100" rx="8"/>
-          <rect x="140" y="160" width="30" height="120" rx="8"/>
-          <rect x="190" y="170" width="30" height="110" rx="8"/>
-        </g>
-        <text x="12" y="340" font-size="14" fill="#7a3d2b">Bryce — hoodoos</text>
-      </svg>
-    `)
+    svg: `<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#fff9f8"/>
+      <g fill="#f1a07a">
+        <rect x="60" y="210" width="30" height="80" rx="8"/>
+        <rect x="120" y="190" width="30" height="100" rx="8"/>
+        <rect x="180" y="170" width="30" height="120" rx="8"/>
+        <rect x="240" y="180" width="30" height="110" rx="8"/>
+      </g>
+      <text x="16" y="335" font-size="16" fill="#7a3d2b">Bryce — hoodoos</text>
+    </svg>`
   },
   {
-    word: "sequoia",
-    hint: "Some of the planet's largest trees.",
-    fact: "Giant sequoias tower to immense heights; the General Sherman tree is among the largest by volume.",
-    soundSeed: [196, 164, 130],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f6fff6"/>
-        <rect x="120" y="40" width="40" height="260" fill="#6b4a2a" rx="8"/>
-        <ellipse cx="140" cy="60" rx="80" ry="30" fill="#7fb974"/>
-        <text x="12" y="340" font-size="14" fill="#2b6b36">Sequoia — giant trees</text>
-      </svg>
-    `)
+    word: "glacier",
+    hint: "Slow rivers of ice carve stone over ages.",
+    fact: "Glaciers leave behind U-shaped valleys, moraines and polished bedrock — a history written in ice.",
+    soundSeed: [150, 180, 220],
+    svg: `<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#f2fbff"/>
+      <path d="M40 260 Q180 100 320 220 T620 220" fill="#d9f0ff"/>
+      <text x="16" y="335" font-size="16" fill="#1f6f8f">Glacier — ice valleys</text>
+    </svg>`
   },
   {
-    word: "badlands",
-    hint: "Eroded clay buttes and rugged badland terrain.",
-    fact: "Badlands National Park features sharply eroded buttes and fossil-rich deposits.",
-    soundSeed: [150, 180, 210],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#fffaf4"/>
-        <path d="M20 250 L100 180 L180 230 L260 150 L340 220 L420 160 L500 240" stroke="#c9b098" stroke-width="14" fill="none"/>
-        <text x="12" y="340" font-size="14" fill="#7a5a3b">Badlands — eroded buttes</text>
-      </svg>
-    `)
-  },
-  {
-    word: "everglades",
-    hint: "A slow-moving 'river of grass'.",
-    fact: "Called the 'river of grass', Everglades are a vast network of wetlands and mangrove ecosystems.",
-    soundSeed: [220, 180, 160],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f7fff9"/>
-        <ellipse cx="300" cy="200" rx="220" ry="80" fill="#cfeedd"/>
-        <text x="12" y="340" font-size="16" fill="#2b6b36">Everglades — wetlands</text>
-      </svg>
-    `)
-  },
-  {
-    word: "rocky",
-    hint: "Alpine peaks, tundra and long trails.",
-    fact: "Rocky Mountain National Park spans high alpine terrain and supports diverse wildlife from elk to pikas.",
-    soundSeed: [164, 196, 220],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f6fbff"/>
-        <path d="M40 280 L120 160 L220 240 L340 120 L540 300" stroke="#6b8da1" stroke-width="12" fill="none"/>
-        <text x="12" y="340" font-size="16" fill="#27465a">Rocky — alpine peaks</text>
-      </svg>
-    `)
-  },
-  {
-    word: "olympic",
-    hint: "Rainforests, mountains and a wild coastline.",
-    fact: "Olympic National Park protects diverse ecosystems from temperate rainforest to glaciated mountains and Pacific beaches.",
-    soundSeed: [180, 210, 240],
-    svg: (`
-      <svg viewBox="0 0 600 360" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f6fff9"/>
-        <path d="M20 250 Q120 120 220 220 T520 200" fill="#d9f0ff"/>
-        <text x="12" y="340" font-size="16" fill="#2b6b36">Olympic — rainforest & coast</text>
-      </svg>
-    `)
+    word: "arches",
+    hint: "Natural sandstone bridges frame the desert sky.",
+    fact: "Millions of years of weathering created over 2,000 arches — delicate forms carved on a grand scale.",
+    soundSeed: [330, 392, 440],
+    svg: `<svg viewBox="0 0 700 360" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#fffaf4"/>
+      <path d="M120 260 Q200 160 280 260" stroke="#e07a48" stroke-width="18" fill="none"/>
+      <path d="M360 260 Q440 140 520 260" stroke="#e07a48" stroke-width="18" fill="none"/>
+      <text x="16" y="335" font-size="16" fill="#8a3a20">Arches — sandstone arches</text>
+    </svg>`
   }
-  // (You can add many more entries. This prototype has a representative set.)
 ];
 
-/* ----------------- state ----------------- */
-let chosen = null;         // chosen entry for the round
+/* ---------- state ---------- */
+let chosen = null;
 let attemptsLeft = 3;
-let history = [];          // guessed words with correct boolean
+let history = []; // {word, correct}
+let clueUnlocked = [true, false, false]; // clue 1 available at start
+let timers = { t1: null, t2: null };
 let audioCtx = null;
 
-/* ----------------- DOM refs ----------------- */
-const themeNameEl = document.getElementById("themeName");
+/* ---------- DOM ---------- */
 const attemptsLeftEl = document.getElementById("attemptsLeft");
-const clueHintEl = document.getElementById("clueHint");
-const clueFactEl = document.getElementById("clueFact");
-const visualEl = document.getElementById("visualSVG") || document.getElementById("visualSVG");
+const clue1El = document.getElementById("clue1");
+const clue2El = document.getElementById("clue2");
+const clue3El = document.getElementById("clue3");
+const visualArea = document.getElementById("visualArea");
 const playSoundBtn = document.getElementById("playSound");
 const guessInput = document.getElementById("guessInput");
 const guessBtn = document.getElementById("guessBtn");
-const invalidMsgEl = document.getElementById("invalidMsg");
+const invalidMsg = document.getElementById("invalidMsg");
 const resultEl = document.getElementById("result");
 const historyEl = document.getElementById("history");
-const revealBtn = document.getElementById("revealBtn");
+const revealBtn = document.getElementById("reveal");
+const newRoundBtn = document.getElementById("newRound");
+const startModal = document.getElementById("startModal");
+const startBtn = document.getElementById("startBtn");
 
-/* ----------------- helpers ----------------- */
-function pickEntryRandom(){
+/* ---------- helpers ---------- */
+function pickRandomEntry(){
   return ENTRIES[Math.floor(Math.random() * ENTRIES.length)];
 }
 
-function setChosen(e){
-  chosen = e;
-  attemptsLeft = 3;
-  history = [];
-  attemptsLeftEl.textContent = attemptsLeft;
-  themeNameEl.textContent = "U.S. National Parks";
-  renderClues();
-  renderVisual();
-  renderHistory();
-  resultEl.textContent = "";
-  invalidMsgEl.textContent = "";
-  guessInput.value = "";
-}
-
-function renderClues(){
-  // show the three kinds of clues (they are unrelated to each other but all point to chosen.word)
-  clueHintEl.textContent = chosen.hint;
-  clueFactEl.textContent = chosen.fact;
-  // sound hint is triggered with play button (no auto-play)
-}
-
-function renderVisual(){
-  if(!visualEl) return;
-  visualEl.innerHTML = chosen.svg || "";
-}
-
-/* ----------------- audio ----------------- */
 function ensureAudio(){
   if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 }
+
+/* tiny audio melody using simple oscillators */
 function playSeed(seed){
   if(!seed || !seed.length) return;
   ensureAudio();
   const now = audioCtx.currentTime;
-  const gain = audioCtx.createGain();
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.connect(audioCtx.destination);
+  const master = audioCtx.createGain();
+  master.gain.setValueAtTime(0.001, now);
+  master.connect(audioCtx.destination);
   let t = now;
-  seed.forEach((freq, i) => {
+  seed.forEach((f,i) => {
     const o = audioCtx.createOscillator();
     o.type = "sine";
-    o.frequency.setValueAtTime(freq, t);
-    const env = audioCtx.createGain();
-    env.gain.setValueAtTime(0, t);
-    env.gain.linearRampToValueAtTime(0.12, t + 0.02);
-    env.gain.linearRampToValueAtTime(0.0001, t + 0.28);
-    o.connect(env);
-    env.connect(gain);
+    o.frequency.setValueAtTime(f, t);
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0005, t);
+    g.gain.linearRampToValueAtTime(0.12, t + 0.02);
+    g.gain.linearRampToValueAtTime(0.0001, t + 0.28);
+    o.connect(g);
+    g.connect(master);
     o.start(t);
     o.stop(t + 0.32);
     t += 0.32;
   });
 }
 
-/* ----------------- gameplay ----------------- */
-function guessWord(){
-  invalidMsgEl.textContent = "";
+/* render chosen entry */
+function renderChosen(){
+  clue1El.textContent = chosen.hint;
+  clue2El.textContent = clueUnlocked[1] ? "🔊 Sound clue available — press Play" : "Locked — wait or guess to unlock";
+  clue3El.textContent = clueUnlocked[2] ? chosen.fact : "Locked — wait or guess to unlock";
+  visualArea.innerHTML = clueUnlocked[2] ? chosen.svg : `<div class="visual muted">Visual locked</div>`;
+  attemptsLeftEl.textContent = attemptsLeft;
+  renderHistory();
+}
+
+/* start timed unlocks */
+function startTimers(){
+  // clear previous
+  clearTimers();
+  // unlock clue2 after 30s
+  timers.t1 = setTimeout(()=> {
+    clueUnlocked[1] = true;
+    clue2El.textContent = "🔊 Sound clue available — press Play";
+  }, 30000);
+  // unlock clue3 after 60s total
+  timers.t2 = setTimeout(()=> {
+    clueUnlocked[2] = true;
+    clue3El.textContent = chosen.fact;
+    visualArea.innerHTML = chosen.svg;
+  }, 60000);
+}
+
+function clearTimers(){
+  if(timers.t1) { clearTimeout(timers.t1); timers.t1 = null; }
+  if(timers.t2) { clearTimeout(timers.t2); timers.t2 = null; }
+}
+
+function renderHistory(){
+  historyEl.innerHTML = "";
+  history.forEach(h => {
+    const r = document.createElement("div");
+    r.className = "row";
+    r.innerHTML = `<div>${escapeHtml(h.word)}</div><div>${h.correct ? '✓' : '✕'}</div>`;
+    historyEl.appendChild(r);
+  });
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[ch])); }
+
+/* ---------- gameplay actions ---------- */
+function startRound(){
+  chosen = pickRandomEntry();
+  attemptsLeft = 3;
+  history = [];
+  clueUnlocked = [true, false, false];
+  clearTimers();
+  renderChosen();
+  startTimers();
+  guessBtn.disabled = false;
+  guessInput.disabled = false;
+  playSoundBtn.disabled = false;
+  resultEl.textContent = "";
+  invalidMsg.textContent = "";
+  revealBtn.classList.remove("hidden");
+  newRoundBtn.classList.add("hidden");
+  attemptsLeftEl.textContent = attemptsLeft;
+}
+
+function onWrongGuessReveal(){
+  // if clue2 locked, unlock; else if clue3 locked, unlock
+  if(!clueUnlocked[1]) {
+    clueUnlocked[1] = true;
+    clue2El.textContent = "🔊 Sound clue available — press Play";
+    // shorten timer for clue3 so player isn't punished
+    if(timers.t2) { clearTimeout(timers.t2); timers.t2 = setTimeout(()=> {
+      clueUnlocked[2] = true;
+      clue3El.textContent = chosen.fact;
+      visualArea.innerHTML = chosen.svg;
+    }, 15000); } // 15s to next
+    return;
+  }
+  if(!clueUnlocked[2]){
+    clueUnlocked[2] = true;
+    clue3El.textContent = chosen.fact;
+    visualArea.innerHTML = chosen.svg;
+    return;
+  }
+}
+
+function guessAction(){
+  invalidMsg.textContent = "";
   resultEl.textContent = "";
   const val = (guessInput.value || "").trim().toLowerCase();
   guessInput.value = "";
-  if(!val){
-    return;
-  }
-  // only accept single-word guesses (no spaces)
+  if(!val) return;
   if(/\s/.test(val)){
-    invalidMsgEl.textContent = "Please enter a single word (no spaces).";
+    invalidMsg.textContent = "Please enter a single word (no spaces).";
     return;
   }
-  // validate the guess: check if guess is in allowed list of candidate words (words in ENTRIES)
-  const allowed = ENTRIES.map(e => e.word.toLowerCase());
+  const allowed = ENTRIES.map(e=>e.word);
   if(!allowed.includes(val)){
-    invalidMsgEl.textContent = "Not a listed park-word — try another related word.";
+    invalidMsg.textContent = "Not a listed park-word — try a related park word.";
     return;
   }
-  // if already guessed, show same result without consuming attempt
   if(history.find(h => h.word === val)){
     resultEl.textContent = `You've already guessed "${val}".`;
     return;
   }
-  // check
-  const correct = (val === chosen.word.toLowerCase());
+  const correct = (val === chosen.word);
   history.unshift({word: val, correct});
   renderHistory();
   if(correct){
@@ -338,88 +243,79 @@ function guessWord(){
     endRound(true);
     return;
   } else {
-    attemptsLeft -= 1;
+    attemptsLeft--;
     attemptsLeftEl.textContent = attemptsLeft;
-    if(attemptsLeft > 0){
-      resultEl.textContent = `Not quite — ${attemptsLeft} attempt${attemptsLeft===1 ? "" : "s"} left.`;
-    } else {
-      resultEl.innerHTML = `💀 Out of attempts — the word was <strong>${chosen.word}</strong>.`;
-      endRound(false);
-    }
+    resultEl.textContent = attemptsLeft > 0 ? `Not it — ${attemptsLeft} attempts left.` : `No attempts left — the word was "${chosen.word}".`;
+    // unlock next clue (on wrong guess)
+    onWrongGuessReveal();
+    if(attemptsLeft <= 0) endRound(false);
   }
-}
-
-function renderHistory(){
-  historyEl.innerHTML = "";
-  history.forEach(h => {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `<div>${escapeHtml(h.word)}</div><div>${h.correct ? '✓' : '✕'}</div>`;
-    historyEl.appendChild(row);
-  });
 }
 
 function endRound(won){
-  // reveal extra facts and lock inputs
-  revealBtn.textContent = "New round";
+  clearTimers();
+  // reveal fact + visual
+  clueUnlocked[1] = true;
+  clueUnlocked[2] = true;
+  clue2El.textContent = "🔊 Sound clue available — press Play";
+  clue3El.textContent = chosen.fact;
+  visualArea.innerHTML = chosen.svg;
+  // lock inputs
   guessBtn.disabled = true;
   guessInput.disabled = true;
   playSoundBtn.disabled = true;
-  revealBtn.onclick = () => {
-    // start a fresh round
-    guessBtn.disabled = false;
-    guessInput.disabled = false;
-    playSoundBtn.disabled = false;
-    revealBtn.textContent = "Reveal answer (end round)";
-    setChosen(pickEntryRandom());
-  };
+  revealBtn.classList.add("hidden");
+  newRoundBtn.classList.remove("hidden");
 }
 
-/* ----------------- utilities ----------------- */
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[ch])); }
-
-/* ----------------- wire events ----------------- */
+/* ---------- events ---------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // pick entry and initialize
-  setChosen(pickEntryRandom());
+  // show start modal once
+  const seen = localStorage.getItem("echoguess_seen_v2");
+  if(!seen){
+    startModal.style.display = "flex";
+  } else {
+    startModal.style.display = "none";
+  }
 
-  // play sound button
+  startBtn.addEventListener("click", () => {
+    localStorage.setItem("echoguess_seen_v2","1");
+    startModal.style.display = "none";
+    startRound();
+    guessInput.focus();
+  });
+
+  // play sound (user gesture required by browsers)
   playSoundBtn.addEventListener("click", () => {
-    try{
-      playSeed(chosen.soundSeed);
-    }catch(e){
-      console.warn(e);
-    }
+    try {
+      if(chosen && chosen.soundSeed) playSeed(chosen.soundSeed);
+    } catch (e) { console.warn(e); }
   });
 
   // guess actions
-  guessBtn.addEventListener("click", guessWord);
-  guessInput.addEventListener("keydown", (e) => {
-    if(e.key === "Enter") guessWord();
+  guessBtn.addEventListener("click", guessAction);
+  guessInput.addEventListener("keydown", e => {
+    if(e.key === "Enter") guessAction();
   });
 
-  // reveal button
+  // reveal (end round)
   revealBtn.addEventListener("click", () => {
-    // immediate reveal (end round)
-    resultEl.innerHTML = `Answer revealed — <strong>${chosen.word}</strong>.`;
-    revealAll();
-    guessBtn.disabled = true;
-    guessInput.disabled = true;
+    resultEl.innerHTML = `Answer: <strong>${chosen.word}</strong>`;
+    endRound(false);
   });
 
-  // click-to-focus convenience
-  document.body.addEventListener("click", (e) => {
-    // small UX: if clicking background, focus input
-    if(e.target === document.body) guessInput.focus();
+  // new round
+  newRoundBtn.addEventListener("click", () => {
+    startRound();
   });
+
+  // start a round if user has already seen modal
+  if(localStorage.getItem("echoguess_seen_v2")) {
+    startRound();
+  }
 });
 
-/* reveal all facts (used on reveal) */
-function revealAll(){
-  if(chosen && chosen.fact){
-    clueFactEl.textContent = chosen.fact + " (extra detail revealed)";
-  }
-}
+
 
 
 
